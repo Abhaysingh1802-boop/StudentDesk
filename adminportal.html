@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudentDesk | Admin dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    :root {
+      /* Tailwind palette: slate foundation, sky actions, teal success. */
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --panel-2: #f1f5f9;
+      --line: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --blue: #0284c7;
+      --cyan: #0f766e;
+      --green: #15803d;
+      --amber: #b45309;
+      --red: #be123c;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px 'DM Sans', sans-serif;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 260px;
+      padding: 26px 16px 20px;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--line);
+      background: #0f172a;
+    }
+
+    .brand {
+      padding: 0 12px 38px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font: 700 21px Outfit, sans-serif;
+      letter-spacing: -.5px;
+      color: #f8fafc;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      aspect-ratio: 1;
+      border-radius: 11px;
+      background: var(--blue);
+      box-shadow: none;
+      color: white;
+      font-size: 15px;
+    }
+
+    .nav-label {
+      margin: 0 12px 10px;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .nav {
+      list-style: none;
+      display: grid;
+      gap: 5px;
+      padding: 0;
+    }
+
+    .nav a {
+      padding: 12px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-weight: 600;
+      transition: .2s;
+    }
+
+    .nav a i {
+      width: 18px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    .nav a:hover {
+      background: #1e293b;
+      color: white;
+    }
+
+    .nav .active a {
+      background: #1e3a5f;
+      color: white;
+      box-shadow: inset 3px 0 #38bdf8;
+    }
+
+    .nav .badge-count {
+      margin-left: auto;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: #334155;
+      color: #e2e8f0;
+      font-size: 11px;
+    }
+
+    .side-bottom {
+      margin-top: auto;
+      border-top: 1px solid #334155;
+      padding: 19px 8px 0;
+    }
+
+    .help {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .help i {
+      color: var(--cyan);
+    }
+
+    .main {
+      width: calc(100% - 260px);
+      padding: 25px 34px 34px;
+      overflow: auto;
+    }
+
+    header {
+      max-width: 1440px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 28px;
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.25px;
+      margin-bottom: 6px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: Outfit, sans-serif;
+    }
+
+    h1 {
+      font-size: 30px;
+      letter-spacing: -.8px;
+    }
+
+    h2 {
+      font-size: 17px;
+      letter-spacing: -.2px;
+    }
+
+    h3 {
+      font-size: 13px;
+    }
+
+    .header-actions,
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .icon-button {
+      width: 39px;
+      height: 39px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      color: var(--muted);
+      background: var(--panel);
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .icon-button:hover {
+      border-color: #7dd3fc;
+      color: var(--blue);
+    }
+
+    .profile {
+      border-left: 1px solid var(--line);
+      padding-left: 15px;
+    }
+
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 39px;
+      height: 39px;
+      border-radius: 50%;
+      background: #0f766e;
+      color: white;
+      font-weight: 700;
+    }
+
+    .profile-name {
+      font-weight: 700;
+    }
+
+    .profile-role {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .content {
+      max-width: 1440px;
+      margin: auto;
+      display: grid;
+      gap: 22px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 17px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 1px 2px #0f172a0d;
+    }
+
+    .stat {
+      min-height: 144px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat:after {
+      content: '';
+      width: 90px;
+      height: 90px;
+      position: absolute;
+      right: -30px;
+      bottom: -40px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: .1;
+      filter: blur(4px);
+    }
+
+    .stat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .stat-icon {
+      display: grid;
+      place-items: center;
+      width: 37px;
+      height: 37px;
+      border-radius: 10px;
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 13%, transparent);
+    }
+
+    .stat-number {
+      margin: 16px 0 5px;
+      font: 700 28px Outfit, sans-serif;
+      letter-spacing: -1px;
+    }
+
+    .trend {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .trend strong {
+      color: var(--green);
+      margin-right: 4px;
+    }
+
+    .trend.neutral strong {
+      color: var(--amber);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(280px, .85fr);
+      gap: 22px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 21px 22px 15px;
+    }
+
+    .card-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .link {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 9px;
+      padding: 0 22px 17px;
+    }
+
+    .field {
+      height: 39px;
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      outline: none;
+      padding: 0 11px;
+    }
+
+    .field:focus,
+    textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px #e0f2fe;
+    }
+
+    .search {
+      flex: 1;
+      min-width: 100px;
+    }
+
+    .primary {
+      height: 39px;
+      border: 0;
+      border-radius: 9px;
+      padding: 0 14px;
+      background: var(--blue);
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: none;
+      transition: .2s;
+      white-space: nowrap;
+    }
+
+    .primary:hover {
+      background: #0369a1;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 670px;
+    }
+
+    th {
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      font-size: 10px;
+      text-align: left;
+      padding: 0 22px 11px;
+    }
+
+    td {
+      border-top: 1px solid var(--line);
+      padding: 14px 22px;
+      color: #475569;
+      font-size: 13px;
+    }
+
+    td strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    tr {
+      transition: .18s;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .tag {
+      padding: 5px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .hall {
+      color: #1d4ed8;
+      background: #dbeafe
+    }
+
+    .room {
+      color: #0f766e;
+      background: #ccfbf1
+    }
+
+    .equipment {
+      color: #b45309;
+      background: #fef3c7
+    }
+
+    .active {
+      color: #15803d;
+      background: #dcfce7
+    }
+
+    .pending {
+      color: #b45309;
+      background: #fef3c7
+    }
+
+    .actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .table-btn {
+      color: #64748b;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .table-btn:hover {
+      color: var(--blue);
+    }
+
+    .table-btn.delete:hover {
+      color: var(--red);
+    }
+
+    .pagination {
+      padding: 16px 22px 19px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .pages {
+      display: flex;
+      gap: 5px
+    }
+
+    .page {
+      width: 28px;
+      height: 27px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 7px;
+      cursor: pointer
+    }
+
+    .page.current {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+    }
+
+    .form-card {
+      padding: 21px 22px;
+    }
+
+    .form-card h2 {
+      margin-bottom: 5px;
+    }
+
+    .form-note {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 21px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      outline: 0;
+      padding: 10px 11px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 76px;
+    }
+
+    .form-group select option {
+      background: #fff;
+    }
+
+    .time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 18px 0;
+      color: #475569;
+      font-size: 13px;
+    }
+
+    .switch {
+      appearance: none;
+      width: 37px;
+      height: 21px;
+      border-radius: 30px;
+      background: #344157;
+      position: relative;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .switch:checked {
+      background: var(--blue);
+    }
+
+    .switch:before {
+      content: '';
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: white;
+      transition: .2s;
+    }
+
+    .switch:checked:before {
+      transform: translateX(16px);
+    }
+
+    .save {
+      width: 100%;
+    }
+
+    .recent .card-header {
+      padding-bottom: 14px;
+    }
+
+    @media(max-width:1100px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .workspace {
+        grid-template-columns: 1fr
+      }
+
+      .form-card {
+        max-width: none
+      }
+
+      .sidebar {
+        width: 215px
+      }
+
+      .main {
+        width: calc(100% - 215px)
+      }
+    }
+
+    @media(max-width:700px) {
+      .sidebar {
+        display: none
+      }
+
+      .main {
+        width: 100%;
+        padding: 20px 16px
+      }
+
+      .header-actions .icon-button,
+      .profile>div:not(.avatar) {
+        display: none
+      }
+
+      .profile {
+        border: 0;
+        padding: 0
+      }
+
+      .stats {
+        grid-template-columns: 1fr
+      }
+
+      .toolbar {
+        flex-wrap: wrap
+      }
+
+      .toolbar .search {
+        flex-basis: 100%
+      }
+
+      header {
+        padding-bottom: 21px
+      }
+
+      h1 {
+        font-size: 25px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div>
+        <div class="brand"><span class="brand-mark"><i class="fa-solid fa-layer-group"></i></span>StudentDesk</div>
+        <p class="nav-label">Workspace</p>
+        <ul class="nav">
+          <li class="active"><a href="#"><i class="fa-solid fa-grid-2"></i>Dashboard</a></li>
+          <li><a href="#"><i class="fa-solid fa-building"></i>Resources <span class="badge-count">25</span></a></li>
+          <li><a href="#"><i class="fa-regular fa-calendar-check"></i>Bookings <span class="badge-count">8</span></a>
+          </li>
+          <li><a href="users.html"><i class="fa-solid fa-users"></i>Users</a></li>
+        </ul>
+      </div>
+      <div class="side-bottom"><a class="help" href="#"><i class="fa-regular fa-circle-question"></i>Help &amp;
+          support</a></div>
+    </aside>
+    <main class="main">
+      <header>
+        <div>
+          <p class="eyebrow">Overview</p>
+          <h1>Good morning, Abhay</h1>
+        </div>
+        <div class="header-actions"><button class="icon-button" aria-label="Notifications"><i
+              class="fa-regular fa-bell"></i></button>
+          <div class="profile">
+            <div class="avatar">A</div>
+            <div><span class="profile-name">Abhay</span><span class="profile-role">Administrator</span></div><i
+              class="fa-solid fa-chevron-down" style="font-size:11px;color:var(--muted)"></i>
+          </div>
+        </div>
+      </header>
+      <div class="content">
+        <section class="stats">
+          <article class="card stat" style="--accent:var(--blue)">
+            <div class="stat-top"><span>Total resources</span><span class="stat-icon"><i
+                  class="fa-solid fa-building"></i></span></div>
+            <p class="stat-number">25</p>
+            <p class="trend"><strong>+12%</strong>from last month</p>
+          </article>
+          <article class="card stat" style="--accent:var(--green)">
+            <div class="stat-top"><span>Total bookings</span><span class="stat-icon"><i
+                  class="fa-regular fa-calendar-check"></i></span></div>
+            <p class="stat-number">41</p>
+            <p class="trend"><strong>+8.4%</strong>from last month</p>
+          </article>
+          <article class="card stat" style="--accent:var(--amber)">
+            <div class="stat-top"><span>Today's bookings</span><span class="stat-icon"><i
+                  class="fa-solid fa-calendar-day"></i></span></div>
+            <p class="stat-number">8</p>
+            <p class="trend neutral"><strong>3 upcoming</strong>this afternoon</p>
+          </article>
+          <article class="card stat" style="--accent:var(--cyan)">
+            <div class="stat-top"><span>Active users</span><span class="stat-icon"><i
+                  class="fa-solid fa-users"></i></span></div>
+            <p class="stat-number">32</p>
+            <p class="trend"><strong>+5.1%</strong>from last month</p>
+          </article>
+        </section>
+        <section class="workspace">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h2>Resources</h2>
+                <p class="card-subtitle">Manage campus spaces and equipment</p>
+              </div><a class="link" href="#">View all</a>
+            </div>
+            <div class="toolbar"><input class="field search" aria-label="Search resources"
+                placeholder="Search resources..."><select class="field" aria-label="Filter category">
+                <option>All categories</option>
+                <option value="hall">Hall</option>
+                <option value="equipment">Equipment</option>
+                <option value="room">Room</option>
+                <option value="other">Other</option>
+              </select><button class="primary"><i class="fa-solid fa-plus"></i> Add resource</button></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Location</th>
+                    <th>Hours</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="resourcesTableBody">
+                  <tr>
+                    <td><strong>Conference Hall A</strong></td>
+                    <td><span class="tag hall">Hall</span></td>
+                    <td>Block A</td>
+                    <td>09:00 – 18:00</td>
+                    <td><span class="tag active">Active</span></td>
+                    <td>
+                      <div class="actions"><button class="table-btn" aria-label="Edit"><i
+                            class="fa-solid fa-pen"></i></button><button class="table-btn delete" aria-label="Delete"><i
+                            class="fa-solid fa-trash"></i></button></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Seminar Room 1</strong></td>
+                    <td><span class="tag room">Room</span></td>
+                    <td>Block B</td>
+                    <td>08:00 – 17:00</td>
+                    <td><span class="tag active">Active</span></td>
+                    <td>
+                      <div class="actions"><button class="table-btn" aria-label="Edit"><i
+                            class="fa-solid fa-pen"></i></button><button class="table-btn delete" aria-label="Delete"><i
+                            class="fa-solid fa-trash"></i></button></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Projector 01</strong></td>
+                    <td><span class="tag equipment">Equipment</span></td>
+                    <td>Library</td>
+                    <td>09:00 – 18:00</td>
+                    <td><span class="tag active">Active</span></td>
+                    <td>
+                      <div class="actions"><button class="table-btn" aria-label="Edit"><i
+                            class="fa-solid fa-pen"></i></button><button class="table-btn delete" aria-label="Delete"><i
+                            class="fa-solid fa-trash"></i></button></div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination"><span>Showing 1–3 of 25 resources</span>
+              <div class="pages"><button class="page"><i class="fa-solid fa-chevron-left"></i></button><button
+                  class="page current">1</button><button class="page">2</button><button class="page">3</button><button
+                  class="page"><i class="fa-solid fa-chevron-right"></i></button></div>
+            </div>
+          </article>
+          <aside class="card form-card">
+            <h2>Add a resource</h2>
+            <p class="form-note">Add a new bookable campus resource.</p>
+            <form id="addResourceForm">
+              <div class="form-group"><label for="name">Resource name</label><input id="name"
+                  placeholder="e.g. Innovation Lab" required></div>
+              <div class="form-group"><label for="category">Category</label><select id="category" required>
+                  <option value="" selected disabled>Select category</option>
+                  <option value="hall">Hall</option>
+                  <option value="equipment">Equipment</option>
+                  <option value="room">Room</option>
+                  <option value="other">Other</option>
+                </select></div>
+              <div class="form-group"><label for="description">Description</label><textarea id="description"
+                  placeholder="Describe this resource" required></textarea></div>
+              <div class="form-group"><label for="location">Location</label><input id="location"
+                  placeholder="e.g. Block C, Floor 2" required></div>
+              <div class="time-grid">
+                <div class="form-group"><label for="open">Open time</label><input id="open" type="time" value="09:00"
+                    required></div>
+                <div class="form-group"><label for="close">Close time</label><input id="close" type="time" value="18:00"
+                    required></div>
+              </div>
+              <div class="toggle"><span>Resource is active</span><input id="isActive" class="switch" type="checkbox"
+                  checked></div><button type="submit" class="primary save">Save resource</button>
+            </form>
+          </aside>
+        </section>
+        <section class="card recent">
+          <div class="card-header">
+            <div>
+              <h2>Recent bookings</h2>
+              <p class="card-subtitle">Latest booking activity across your campus</p>
+            </div><a class="link" href="#">View all bookings <i class="fa-solid fa-arrow-right"
+                style="font-size:11px"></i></a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Resource</th>
+                  <th>Booked by</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Conference Hall A</strong></td>
+                  <td>Abhay R.</td>
+                  <td>28 Jul 2026</td>
+                  <td>10:00 – 11:30</td>
+                  <td><span class="tag active">Approved</span></td>
+                  <td><button class="table-btn" aria-label="More options"><i class="fa-solid fa-ellipsis"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Projector 01</strong></td>
+                  <td>Kishan M.</td>
+                  <td>28 Jul 2026</td>
+                  <td>12:00 – 14:00</td>
+                  <td><span class="tag pending">Pending</span></td>
+                  <td><button class="table-btn" aria-label="More options"><i class="fa-solid fa-ellipsis"></i></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td><strong>Seminar Room 1</strong></td>
+                  <td>Pooja S.</td>
+                  <td>28 Jul 2026</td>
+                  <td>15:00 – 16:30</td>
+                  <td><span class="tag active">Approved</span></td>
+                  <td><button class="table-btn" aria-label="More options"><i class="fa-solid fa-ellipsis"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+      <script>
+        const API_URL = "http://127.0.0.1:3000";
+
+        async function callAddResource(resource) {
+          const response = await fetch(`${API_URL}/AddResource`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(resource),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Unable to add resource.");
+          }
+
+          return data;
+        }
+        async function callDelete(id) {
+          const response = await fetch(`${API_URL}/delete/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Unable to delete resource.");
+          }
+
+          return data;
+        }
+        async function getAllResources() {
+          const response = await fetch(`${API_URL}/resources`, {
+            credentials: "include",
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || "Unable to load resources.");
+          }
+
+          const tableBody = document.getElementById("resourcesTableBody");
+
+          if (data.resources.length === 0) {
+            tableBody.innerHTML = `
+              <tr>
+                <td colspan="6">No active resources found.</td>
+              </tr>
+            `;
+            return;
+          }
+          tableBody.innerHTML = data.resources.map((resource) => `
+            <tr>
+              <td><strong>${resource.name}</strong></td>
+              <td><span class="tag ${resource.category}">${resource.category}</span></td>
+              <td>${resource.location}</td>
+              <td>${resource.openTime} - ${resource.closeTime}</td>
+              <td><span class="tag active">Active</span></td>
+              <td>
+                <div class="actions">
+                  <button
+                    class="table-btn delete"
+                    type="button"
+                    aria-label="Delete ${resource.name}"
+                    data-resource-id="${resource._id}">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `).join("");
+        }
+
+
+        document.getElementById("addResourceForm").addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const form = event.currentTarget;
+
+          const resource = {
+            name: document.getElementById("name").value.trim(),
+            category: document.getElementById("category").value,
+            description: document.getElementById("description").value.trim(),
+            location: document.getElementById("location").value.trim(),
+            openTime: document.getElementById("open").value,
+            closeTime: document.getElementById("close").value,
+            isActive: document.getElementById("isActive").checked,
+          };
+
+          try {
+            await callAddResource(resource);
+            await getAllResources();
+            alert("Resource added successfully.");
+            form.reset();
+            document.getElementById("isActive").checked = true;
+          } catch (error) {
+            alert(error.message);
+          }
+        });
+        document.getElementById("resourcesTableBody").addEventListener("click", async (event) => {
+          const deleteButton = event.target.closest(".delete");
+
+          if (!deleteButton) return;
+
+          const id = deleteButton.dataset.resourceId;
+
+          if (!confirm("Delete this resource?")) return;
+
+          try {
+            await callDelete(id);
+            await getAllResources();
+          } catch (error) {
+            alert(error.message);
+          }
+        });
+        document.addEventListener("DOMContentLoaded", () => {
+          getAllResources().catch((error) => {
+            document.getElementById("resourcesTableBody").innerHTML = `
+              <tr>
+                <td colspan="6">${error.message}</td>
+              </tr>
+            `;
+          });
+        });
+      </script>
+    </main>
+  </div>
+</body>
+
+</html>

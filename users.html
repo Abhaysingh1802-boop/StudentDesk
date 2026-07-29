@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Users | StudentDesk</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    :root { --blue: #2563eb; --ink: #172033; --muted: #64748b; --line: #e2e8f0; --bg: #f8fafc; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: Arial, sans-serif; }
+    .app { min-height: 100vh; display: flex; }
+    .sidebar { width: 240px; padding: 28px 16px; background: #0f2c59; color: #fff; }
+    .brand { font-size: 21px; font-weight: 700; margin: 0 12px 42px; }
+    .nav-label { margin: 0 12px 10px; color: #a9c0e3; font-size: 12px; text-transform: uppercase; }
+    .nav { padding: 0; margin: 0; list-style: none; }
+    .nav a { display: flex; gap: 12px; align-items: center; padding: 12px; color: #d9e6fa; border-radius: 8px; text-decoration: none; }
+    .nav .active a, .nav a:hover { background: #2563eb; color: #fff; }
+    .main { flex: 1; padding: 36px; }
+    .eyebrow { margin: 0; color: var(--blue); font-size: 13px; font-weight: 700; text-transform: uppercase; }
+    h1 { margin: 8px 0 28px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .card-header { padding: 22px 24px; border-bottom: 1px solid var(--line); }
+    h2 { margin: 0; font-size: 20px; }
+    .card-subtitle { margin: 6px 0 0; color: var(--muted); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 16px 24px; text-align: left; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; }
+    .tag { display: inline-block; padding: 5px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .tag.active { background: #dcfce7; color: #166534; }
+    .tag.pending { background: #fef3c7; color: #92400e; }
+    .table-btn { border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+    @media (max-width: 700px) { .sidebar { width: 70px; padding: 24px 8px; } .brand, .nav-label, .nav a { font-size: 0; } .nav a i { font-size: 17px; } .main { padding: 22px 14px; } th, td { padding: 14px; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><i class="fa-solid fa-layer-group"></i> StudentDesk</div>
+      <p class="nav-label">Workspace</p>
+      <ul class="nav">
+        <li><a href="adminportal.html"><i class="fa-solid fa-grid-2"></i>Dashboard</a></li>
+        <li><a href="adminportal.html"><i class="fa-solid fa-building"></i>Resources</a></li>
+        <li><a href="adminportal.html"><i class="fa-regular fa-calendar-check"></i>Bookings</a></li>
+        <li class="active"><a href="users.html"><i class="fa-solid fa-users"></i>Users</a></li>
+      </ul>
+    </aside>
+    <main class="main">
+      <p class="eyebrow">Administration</p>
+      <h1>All Users</h1>
+      <section class="card">
+        <div class="card-header">
+          <h2>Users</h2>
+          <p class="card-subtitle">Registered StudentDesk accounts</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th></th></tr></thead>
+            <tbody id="UserTableBody"><tr><td colspan="5">Loading users...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    const API_URL = "http://127.0.0.1:3000";
+    async function getAllUser() {
+      const response = await fetch(`${API_URL}/AllUsers`, { credentials: "include" });
+      const data = await response.json();
+      const tableBody = document.getElementById("UserTableBody");
+      if (!response.ok) throw new Error(data.message || "Unable to load users.");
+      const users = data.response || [];
+      if (users.length === 0) { tableBody.innerHTML = '<tr><td colspan="5">No users found.</td></tr>'; return; }
+      tableBody.innerHTML = users.map((user) => `
+        <tr>
+          <td><strong>${user.name}</strong></td><td>${user.email}</td>
+          <td><span class="tag ${user.role === "admin" ? "pending" : "active"}">${user.role}</span></td>
+          <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+          <td><button class="table-btn" type="button" aria-label="More options for ${user.name}"><i class="fa-solid fa-ellipsis"></i></button></td>
+        </tr>`).join("");
+    }
+    document.addEventListener("DOMContentLoaded", () => getAllUser().catch((error) => {
+      document.getElementById("UserTableBody").innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
+    }));
+  </script>
+</body>
+</html>
