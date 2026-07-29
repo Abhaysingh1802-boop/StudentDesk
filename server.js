@@ -8,6 +8,7 @@ const signupRoutes = require("./signup.js");
 const adminRoutes = require("./admin.js");
 
 const app = express();
+app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
