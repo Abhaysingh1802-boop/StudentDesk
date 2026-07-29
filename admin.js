@@ -1,7 +1,7 @@
 const express = require("express");
 const { Resource, User } = require("./models");
 const { auth, adminOnly } = require("./middlewares/auth");
-const { patch } = require("./signup.Js");
+const { patch } = require("./signup.js");
 
 const router = express.Router();
 
