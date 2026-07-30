@@ -903,7 +903,8 @@
         </section>
       </div>
       <script>
-        const API_URL = "http://127.0.0.1:3000";
+        // Relative paths use this same Render service in production and localhost in development.
+        const API_URL = "";
 
         async function callAddResource(resource) {
           const response = await fetch(`${API_URL}/AddResource`, {

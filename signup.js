@@ -23,7 +23,7 @@ function sendToken(user, res) {
 
     res.cookie("token", token, {
         httpOnly: true,
-        secure: false,      // Set true in production (HTTPS)
+        secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         maxAge: 24 * 60 * 60 * 1000
     });

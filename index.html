@@ -338,7 +338,7 @@
 
         // 1) Sends OTP request
         async function callSendOtpAPI(email) {
-            const res = await fetch("http://127.0.0.1:3000/sendotp", {
+            const res = await fetch("/sendotp", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -357,7 +357,7 @@
 
         // 2) Verifies OTP and registers user
         async function callVerifyOtpAndSignUpAPI(name, email, otp) {
-            const res = await fetch("http://127.0.0.1:3000/signup", {
+            const res = await fetch("/signup", {
                 method: "POST",
                 credentials: "include",   // Important
                 headers: {
@@ -377,7 +377,7 @@
 
         // 3) Logs in an existing user after OTP verification.
         async function callLoginAPI(email, otp) {
-            const res = await fetch("http://127.0.0.1:3000/login", {
+            const res = await fetch("/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -394,7 +394,7 @@
            
             return data;
         } async function callLoginAPI(email, otp) {
-            const res = await fetch("http://127.0.0.1:3000/login", {
+            const res = await fetch("/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
