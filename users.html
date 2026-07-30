@@ -77,8 +77,30 @@
           <td><strong>${user.name}</strong></td><td>${user.email}</td>
           <td><span class="tag ${user.role === "admin" ? "pending" : "active"}">${user.role}</span></td>
           <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-          <td><button class="table-btn" type="button" aria-label="More options for ${user.name}"><i class="fa-solid fa-ellipsis"></i></button></td>
+          <td><button class="table-btn" type="button" onclick="updateUserRole('${user._id}', '${user.role}').catch((error) => window.alert(error.message))" aria-label="Update role for ${user.name}">Update role</button></td>
         </tr>`).join("");
+    }
+
+    async function updateUserRole(id, currentRole) {
+      const role = window.prompt("Enter role: user or admin", currentRole);
+      if (role === null) return;
+
+      const normalizedRole = role.trim().toLowerCase();
+      if (!["user", "admin"].includes(normalizedRole)) {
+        window.alert("Role must be user or admin.");
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/users/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role: normalizedRole }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.message || "Unable to update user.");
+      await getAllUser();
     }
     document.addEventListener("DOMContentLoaded", () => getAllUser().catch((error) => {
       document.getElementById("UserTableBody").innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;

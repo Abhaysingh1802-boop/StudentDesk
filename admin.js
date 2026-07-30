@@ -92,4 +92,28 @@ router.get("/AllUsers", auth, adminOnly, async (req, res) => {
     });
   }
 });
+
+router.patch("/users/:id", auth, adminOnly, async (req, res) => {
+  try {
+    const { role } = req.body;
+
+    if (!["user", "admin"].includes(role)) {
+      return res.status(400).json({ message: "Role must be user or admin." });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { role },
+      { new: true, runValidators: true }
+    ).select("name email role createdAt");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    return res.status(200).json({ message: "User updated successfully.", user });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+});
 module.exports = router;
