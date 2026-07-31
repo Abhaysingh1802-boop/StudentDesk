@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const signupRoutes = require("./signup.js");
 const adminRoutes = require("./admin.js");
+const bookingRoutes = require("./book.js");
 
 const app = express();
 app.use(express.static(__dirname));
@@ -22,6 +23,7 @@ app.use(cookieParser());
 
 app.use(signupRoutes);
 app.use(adminRoutes);
+app.use(bookingRoutes);
 app.get("/health", (req, res) => {
   res.json({ message: "StudentDesk API is running" });
 });
