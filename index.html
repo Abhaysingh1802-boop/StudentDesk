@@ -393,23 +393,6 @@
             }
            
             return data;
-        } async function callLoginAPI(email, otp) {
-            const res = await fetch("/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                body: JSON.stringify({ email, otp })
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.message || "Unable to log in");
-            }
-
-            return data;
         }
 
         // 4) Resends OTP
@@ -530,11 +513,13 @@
                         localStorage.setItem('authToken', result.token);
                     }
                     alert('Login successful!');
-                    window.location.href = "userdashboard.html";
+                    window.location.href = result.user.role === "admin"
+                        ? "adminportal.html"
+                        : "userdashboard.html";
                 } else {
                     await callVerifyOtpAndSignUpAPI(name, email, otp);
                     alert("Account created successfully!");
-                     window.location.href = "adminportal.html";
+                    window.location.href = "userdashboard.html";
                 }
             } catch (err) {
                 setHint("otpHint", err.message || "Verification failed. Check the code and try again.");
