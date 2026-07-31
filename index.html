@@ -530,7 +530,7 @@
                         localStorage.setItem('authToken', result.token);
                     }
                     alert('Login successful!');
-                    window.location.href = "adminportal.html";
+                    window.location.href = "userdashboard.html";
                 } else {
                     await callVerifyOtpAndSignUpAPI(name, email, otp);
                     alert("Account created successfully!");
