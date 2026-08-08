@@ -60,9 +60,19 @@ router.delete("/delete/:id", auth, adminOnly, async (req, res) => {
 });
 router.get("/resources", auth, async (req, res) => {
   try {
-    const resources = await Resource.find({ isActive: true })
-      .sort({ createdAt: -1 })
-      .limit(20);
+    const filter = {};
+    if (req.query.search) {
+      const term = req.query.search.trim();
+      filter.$or = [
+        { name: { $regex: term, $options: "i" } },
+        { location: { $regex: term, $options: "i" } },
+      ];
+    }
+    if (req.query.category && req.query.category !== "all") {
+      filter.category = req.query.category;
+    }
+
+    const resources = await Resource.find(filter).sort({ createdAt: -1 });
 
     return res.status(200).json({
       message: "Resources fetched successfully",
@@ -94,6 +104,24 @@ router.get("/admin/bookings", auth, adminOnly, async (req, res) => {
     const bookings = await Booking.find().populate("resource", "name location").populate("user", "name email").sort({ date: -1, startTime: -1 });
     res.json({ bookings });
   } catch (error) { res.status(500).json({ message: "Unable to load bookings" }); }
+});
+
+router.patch("/admin/bookings/:id/cancel", auth, adminOnly, async (req, res) => {
+  try {
+    const booking = await Booking.findOneAndUpdate(
+      { _id: req.params.id, status: "confirmed" },
+      { status: "cancelled" },
+      { new: true }
+    ).populate("resource", "name location").populate("user", "name email");
+
+    if (!booking) {
+      return res.status(404).json({ message: "Active booking not found" });
+    }
+
+    return res.json({ message: "Booking cancelled", booking });
+  } catch (error) {
+    return res.status(400).json({ message: "Unable to cancel booking" });
+  }
 });
 router.get("/AllUsers", auth, adminOnly, async (req, res) => {
   try {
