@@ -8,6 +8,7 @@ const signupRoutes = require("./signup.js");
 const adminRoutes = require("./admin.js");
 const bookingRoutes = require("./book.js");
 const userBookingRoutes = require("./booking.js");
+const { startReminderScheduler } = require("./reminders.js");
 
 const app = express();
 app.use(express.static(__dirname));
@@ -37,6 +38,7 @@ async function startServer() {
     );
 
     console.log("MongoDB connected");
+    startReminderScheduler();
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   } catch (error) {
     console.error("Unable to start server:", error.message);
