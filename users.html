@@ -31,6 +31,28 @@
     .tag.active { background: #dcfce7; color: #166534; }
     .tag.pending { background: #fef3c7; color: #92400e; }
     .table-btn { border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+    .role-select { padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--ink); font: inherit; font-size: 13px; }
+    .role-select:disabled { opacity: .5; cursor: not-allowed; }
+    .row-busy { opacity: .55; pointer-events: none; }
+
+    .modal-overlay { position: fixed; inset: 0; background: #0f172acc; display: grid; place-items: center; padding: 20px; z-index: 60; }
+    .modal { width: 100%; max-width: 380px; background: #fff; border-radius: 12px; padding: 22px; }
+    .modal h3 { margin: 0 0 8px; font-size: 17px; }
+    .modal p { margin: 0 0 20px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .btn { border: 0; border-radius: 8px; padding: 9px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+    .btn.ghost { background: transparent; color: var(--muted); }
+    .btn.ghost:hover { background: var(--bg); }
+    .btn.primary { background: var(--blue); color: #fff; }
+    .btn.primary:hover { background: #1d4ed8; }
+    .btn.primary:disabled { opacity: .6; cursor: not-allowed; }
+
+    .toast-stack { position: fixed; bottom: 20px; right: 20px; display: grid; gap: 8px; z-index: 70; }
+    .toast { min-width: 220px; max-width: 320px; padding: 12px 14px; border-radius: 9px; background: #172033; color: #fff; font-size: 13px; box-shadow: 0 6px 20px #0000002e; animation: toast-in .18s ease-out; }
+    .toast.error { background: #be123c; }
+    .toast.success { background: #166534; }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
     @media (max-width: 700px) { .sidebar { width: 70px; padding: 24px 8px; } .brand, .nav-label, .nav a { font-size: 0; } .nav a i { font-size: 17px; } .main { padding: 22px 14px; } th, td { padding: 14px; } }
   </style>
 </head>
@@ -63,8 +85,42 @@
       </section>
     </main>
   </div>
+
+  <div class="modal-overlay" id="confirmOverlay" style="display:none">
+    <div class="modal">
+      <h3 id="confirmTitle">Change role</h3>
+      <p id="confirmBody"></p>
+      <div class="modal-actions">
+        <button class="btn ghost" type="button" id="confirmCancel">Cancel</button>
+        <button class="btn primary" type="button" id="confirmSubmit">Confirm</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast-stack" id="toastStack"></div>
+
   <script>
     const API_URL = "";
+    let currentUserId = null;
+    let pendingChange = null; // { id, name, fromRole, toRole, selectEl }
+
+    const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+
+    function showToast(message, type = "success") {
+      const stack = document.getElementById("toastStack");
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      stack.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    async function loadCurrentUser() {
+      const response = await fetch(`${API_URL}/me`, { credentials: "include" });
+      const data = await response.json().catch(() => ({}));
+      if (response.status === 401 || response.status === 403) { location.href = "index.html"; return; }
+      if (response.ok && data.user) currentUserId = data.user.id;
+    }
+
     async function getAllUser() {
       const response = await fetch(`${API_URL}/AllUsers`, { credentials: "include" });
       const data = await response.json();
@@ -73,38 +129,91 @@
       const users = data.response || [];
       if (users.length === 0) { tableBody.innerHTML = '<tr><td colspan="5">No users found.</td></tr>'; return; }
       tableBody.innerHTML = users.map((user) => `
-        <tr>
-          <td><strong>${user.name}</strong></td><td>${user.email}</td>
-          <td><span class="tag ${user.role === "admin" ? "pending" : "active"}">${user.role}</span></td>
+        <tr data-user-row="${user._id}">
+          <td><strong>${escapeHtml(user.name)}</strong></td><td>${escapeHtml(user.email)}</td>
+          <td>
+            <select class="role-select" data-user-id="${user._id}" data-user-name="${escapeHtml(user.name)}"
+              aria-label="Role for ${escapeHtml(user.name)}" ${user._id === currentUserId ? "disabled title=\"You can't change your own role\"" : ""}>
+              <option value="user" ${user.role === "user" ? "selected" : ""}>user</option>
+              <option value="admin" ${user.role === "admin" ? "selected" : ""}>admin</option>
+            </select>
+          </td>
           <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-          <td><button class="table-btn" type="button" onclick="updateUserRole('${user._id}', '${user.role}').catch((error) => window.alert(error.message))" aria-label="Update role for ${user.name}">Update role</button></td>
+          <td></td>
         </tr>`).join("");
     }
 
-    async function updateUserRole(id, currentRole) {
-      const role = window.prompt("Enter role: user or admin", currentRole);
-      if (role === null) return;
-
-      const normalizedRole = role.trim().toLowerCase();
-      if (!["user", "admin"].includes(normalizedRole)) {
-        window.alert("Role must be user or admin.");
-        return;
-      }
-
-      const response = await fetch(`${API_URL}/users/${id}`, {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: normalizedRole }),
-      });
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.message || "Unable to update user.");
-      await getAllUser();
+    function openConfirm({ id, name, fromRole, toRole, selectEl }) {
+      pendingChange = { id, name, fromRole, toRole, selectEl };
+      document.getElementById("confirmTitle").textContent = toRole === "admin" ? "Grant admin access" : "Remove admin access"; // to check if the new role is admin or user
+      document.getElementById("confirmBody").textContent =
+        `Change ${name}'s role from ${fromRole} to ${toRole}? This takes effect immediately.`;
+      document.getElementById("confirmOverlay").style.display = "grid";
     }
-    document.addEventListener("DOMContentLoaded", () => getAllUser().catch((error) => {
-      document.getElementById("UserTableBody").innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
-    }));
+
+    function closeConfirm(revert) {
+      if (revert && pendingChange) pendingChange.selectEl.value = pendingChange.fromRole;
+      pendingChange = null;
+      document.getElementById("confirmOverlay").style.display = "none";
+    }
+
+    async function submitRoleChange() {
+      if (!pendingChange) return;
+      const { id, toRole, selectEl } = pendingChange;
+      const row = selectEl.closest("tr");
+      const confirmBtn = document.getElementById("confirmSubmit");
+      confirmBtn.disabled = true;
+      row.classList.add("row-busy");
+      selectEl.disabled = true;
+
+      try {
+        const response = await fetch(`${API_URL}/users/${id}`, {
+          method: "PATCH",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: toRole }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || "Unable to update user.");
+        showToast(`${data.user.name}'s role is now ${data.user.role}.`, "success");
+        closeConfirm(false);
+      } catch (error) {
+        showToast(error.message, "error");
+        closeConfirm(true);
+      } finally {
+        confirmBtn.disabled = false;
+        row.classList.remove("row-busy");
+        if (selectEl.dataset.userId !== currentUserId) selectEl.disabled = false;
+      }
+    }
+
+    document.getElementById("UserTableBody").addEventListener("change", (event) => {
+      const select = event.target.closest(".role-select");
+      if (!select) return;
+      const fromRole = select.value === "admin" ? "user" : "admin"; // the option that was just deselected
+      openConfirm({
+        id: select.dataset.userId,
+        name: select.dataset.userName,
+        fromRole,
+        toRole: select.value,
+        selectEl: select,
+      });
+    });
+
+    document.getElementById("confirmCancel").addEventListener("click", () => closeConfirm(true));
+    document.getElementById("confirmOverlay").addEventListener("click", (event) => {
+      if (event.target.id === "confirmOverlay") closeConfirm(true);
+    });
+    document.getElementById("confirmSubmit").addEventListener("click", submitRoleChange);
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        await loadCurrentUser();
+        await getAllUser();
+      } catch (error) {
+        document.getElementById("UserTableBody").innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
+      }
+    });
   </script>
 </body>
 </html>

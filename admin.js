@@ -71,7 +71,7 @@ router.get("/resources", auth, async (req, res) => {
     if (req.query.category && req.query.category !== "all") {
       filter.category = req.query.category;
     }
-
+// for filtering resources
     const resources = await Resource.find(filter).sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -148,6 +148,10 @@ router.patch("/users/:id", auth, adminOnly, async (req, res) => {
 
     if (!["user", "admin"].includes(role)) {
       return res.status(400).json({ message: "Role must be user or admin." });
+    }
+// you can't remove your own admin access
+    if (req.user._id.toString() === req.params.id && role !== "admin") {
+      return res.status(400).json({ message: "You can't remove your own admin access." });
     }
 
     const user = await User.findByIdAndUpdate(
