@@ -951,7 +951,7 @@
     </main>
   </div>
   <script>
-    const API_URL = location.port === "3000" ? "" : `${location.protocol}//${location.hostname}:3000`;
+    const API_URL = "";
     const $ = (selector) => document.querySelector(selector);
     const esc = (value = "") => String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
     const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });

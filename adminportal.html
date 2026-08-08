@@ -904,7 +904,7 @@
       </div>
       <script>
         // Relative paths use this same Render service in production and localhost in development.
-        const API_URL = location.port === "3000" ? "" : `${location.protocol}//${location.hostname}:3000`;
+        const API_URL = "";
         const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
         const dateLabel = (date) => new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
 
