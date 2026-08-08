@@ -163,4 +163,17 @@ router.post("/login", async (req, res) => {
     }
 });
 
+router.get("/me", require("./middlewares/auth").auth, (req, res) => {
+    res.json({ user: { id: req.user._id, name: req.user.name, email: req.user.email, role: req.user.role } });
+});
+
+router.post("/logout", (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax"
+    });
+    res.json({ message: "Logged out successfully" });
+});
+
 module.exports = router;

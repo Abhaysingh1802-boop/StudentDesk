@@ -827,26 +827,26 @@
       <nav class="nav">
         <a class="active" href="#"><i class="fa-solid fa-house"></i>Dashboard</a>
         <a href="#" id="resources-link"><i class="fa-regular fa-book-open"></i>Resources</a>
-        <a href="#"><i class="fa-regular fa-calendar-check"></i>My Bookings</a>
-        <a href="#"><i class="fa-regular fa-calendar"></i>Calendar</a>
-        <a href="#"><i class="fa-regular fa-user"></i>Profile</a>
+        <a href="#" id="bookings-link"><i class="fa-regular fa-calendar-check"></i>My Bookings</a>
+        <a href="#" id="calendar-link"><i class="fa-regular fa-calendar"></i>Calendar</a>
+        <a href="#" id="profile-link"><i class="fa-regular fa-user"></i>Profile</a>
         <a href="#"><i class="fa-regular fa-bell"></i>Notifications</a>
       </nav>
       <section class="help-card">
         <div class="help-icon"><i class="fa-regular fa-calendar-check"></i></div>
         <h3>Need a resource?</h3>
-        <p>Check availability and book in seconds.</p><button class="primary-btn">Book Now</button>
+        <p>Check availability and book in seconds.</p><button class="primary-btn" data-open-booking>Book Now</button>
       </section>
     </aside>
     <main class="content">
       <header class="topbar">
         <button class="menu-toggle" id="menu-toggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
         <label class="search"><i class="fa-solid fa-magnifying-glass"></i><input type="search"
-            placeholder="Search resources..."></label>
+            placeholder="Search resources..." id="resource-search"></label>
         <div class="profile"><button class="notification" aria-label="Notifications"><i
               class="fa-regular fa-bell"></i><b>3</b></button>
           <div class="avatar"><i class="fa-regular fa-user"></i></div>
-          <div class="profile-copy"><strong>Arjun</strong><span>Student</span></div><button class="chevron"
+          <div class="profile-copy"><strong id="profile-name">Student</strong><span id="profile-role">Student</span></div><button class="chevron" id="logout-button"
             aria-label="Profile options"><i class="fa-solid fa-chevron-down"></i></button>
         </div>
       </header>
@@ -854,33 +854,34 @@
         <div class="main-column">
           <section class="heading">
             <div>
-              <h1>Good afternoon, Arjun! 👋</h1>
-              <p>You have 2 upcoming bookings</p>
-            </div><button class="primary-btn book-btn"><i class="fa-regular fa-calendar-plus"></i>Book Resource</button>
+              <h1 id="greeting">Welcome!</h1>
+              <p id="booking-summary">Loading your bookings...</p>
+            </div><button class="primary-btn book-btn" data-open-booking><i class="fa-regular fa-calendar-plus"></i>Book Resource</button>
           </section>
           <section class="stat-grid">
             <article class="stat highlight">
               <div class="stat-head"><span class="stat-icon"><i class="fa-regular fa-calendar-check"></i></span>Upcoming
-                Bookings</div><strong>2</strong><a href="#">View all <i class="fa-solid fa-arrow-right"></i></a>
+                Bookings</div><strong id="upcoming-count">—</strong><a href="#" id="view-bookings">View all <i class="fa-solid fa-arrow-right"></i></a>
             </article>
             <article class="stat">
               <div class="stat-head"><span class="stat-icon"><i class="fa-regular fa-clipboard"></i></span>Available
-                Resources</div><strong>12</strong><small>today</small>
+                Resources</div><strong id="resource-count">—</strong><small>available today</small>
             </article>
             <article class="stat">
               <div class="stat-head"><span class="stat-icon"><i class="fa-regular fa-bell"></i></span>Next reminder in
-              </div><strong class="no-indent">1h</strong><a href="#">View details <i
+              </div><strong class="no-indent" id="next-reminder">—</strong><a href="#" id="view-reminders">View details <i
                   class="fa-solid fa-arrow-right"></i></a>
             </article>
             <article class="stat">
               <div class="stat-head"><span class="stat-icon"><i class="fa-regular fa-calendar"></i></span>Total Bookings
-              </div><strong class="no-indent">8</strong><small class="compact">This Month</small>
+              </div><strong class="no-indent" id="total-bookings">—</strong><small class="compact">All time</small>
             </article>
           </section>
           <section class="card bookings">
             <div class="card-title">
-              <h2>My Upcoming Bookings</h2><button class="text-link">View all</button>
+              <h2>My Upcoming Bookings</h2><button class="text-link" id="view-all-bookings">View all</button>
             </div>
+            <div id="upcoming-bookings"><p>Loading bookings...</p></div><!--
             <article class="booking-row">
               <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
                 <div><strong>Seminar Hall A</strong><span><i class="fa-solid fa-location-dot"></i>Main Campus</span>
@@ -907,15 +908,15 @@
                   12:00</span></div><span class="status">Confirmed</span><button class="more"
                 aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
             </article>
-            <div class="notice"><i class="fa-solid fa-circle-info"></i>You're all set! We'll send you a reminder 1 hour
-              before your booking starts.</div>
+            -->
+            <div class="notice"><i class="fa-solid fa-circle-info"></i>You'll see your next booking here, with a reminder before it starts.</div>
           </section>
           <section class="card popular">
             <div class="card-title">
-              <h2>Popular Resources</h2><button class="text-link">View all resources <i
+              <h2>Available Resources</h2><button class="text-link" id="view-resources">View all resources <i
                   class="fa-solid fa-arrow-right"></i></button>
             </div>
-            <div class="resource-cards">
+            <div class="resource-cards" id="popular-resources">
               <article class="resource-card"><i class="fa-regular fa-building"></i><strong>Seminar Hall
                   A</strong><span><i class="fa-regular fa-calendar"></i>Main Campus</span></article>
               <article class="resource-card"><i class="fa-regular fa-building"></i><strong>Seminar Hall
@@ -931,7 +932,7 @@
         </div>
         <aside class="right-column">
           <section class="card quick-book">
-            <h2>Quick Book</h2><button class="primary-btn"><i class="fa-solid fa-circle-plus"></i>Quick Book</button>
+            <h2>Quick Book</h2><button class="primary-btn" data-open-booking><i class="fa-solid fa-circle-plus"></i>Quick Book</button>
             <p>Book a resource in just a few clicks.</p>
           </section>
           <section class="card reminders">
@@ -949,69 +950,70 @@
       </div>
     </main>
   </div>
-  <script>document.getElementById('menu-toggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
-    async function CallResourceBYdate(date) {
-      try {
-        const response = await fetch(`/Resource/data/${date}`, {
-          credentials: "include",
-        });
+  <script>
+    const API_URL = location.port === "3000" ? "" : `${location.protocol}//${location.hostname}:3000`;
+    const $ = (selector) => document.querySelector(selector);
+    const esc = (value = "") => String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+    const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+    let resources = [];
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Unable to fetch resources");
-        }
-
-        return data.resources;
-      } catch (error) {
-        throw error;
-      }
+    async function api(path, options = {}) {
+      const response = await fetch(`${API_URL}${path}`, { credentials: "include", headers: { "Content-Type": "application/json", ...(options.headers || {}) }, ...options });
+      const data = await response.json().catch(() => ({}));
+      if (response.status === 401) { location.href = "index.html"; throw new Error("Please log in again"); }
+      if (!response.ok) throw new Error(data.message || "Something went wrong");
+      return data;
     }
-
-    function showResources(resources, date) {
-      const content = document.getElementById("dashboard-content");
-      const cards = resources.length
-        ? resources.map((resource) => `
-          <article class="resource-card">
-            <i class="fa-solid fa-building"></i>
-            <strong>${resource.name}</strong>
-            <span><i class="fa-solid fa-location-dot"></i>${resource.location}</span>
-            <span>${resource.openTime} - ${resource.closeTime}</span>
-          </article>`).join("")
-        : `<p>No resources were created on ${date}.</p>`;
-
-      content.innerHTML = `
-        <section class="card popular" style="width:100%">
-          <div class="card-title"><h2>Resources by creation date</h2></div>
-          <label class="search" style="max-width:260px; margin:16px 0">
-            <input id="resource-date" type="date" value="${date}" aria-label="Creation date">
-          </label>
-          <button class="primary-btn" id="find-resources">Find resources</button>
-          <div class="resource-cards" id="resource-results" style="margin-top:20px">${cards}</div>
-        </section>`;
-
-      document.getElementById("find-resources").addEventListener("click", loadResourcesForDate);
+    const formatDate = (date) => new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    const resourceIcon = (category) => category === "equipment" ? "fa-display" : category === "hall" ? "fa-building" : "fa-door-open";
+    function renderResources(target, list) {
+      target.innerHTML = list.length ? list.map(r => `<article class="resource-card" data-resource-id="${r._id}"><i class="fa-solid ${resourceIcon(r.category)}"></i><strong>${esc(r.name)}</strong><span><i class="fa-solid fa-location-dot"></i>${esc(r.location)}</span><span>${esc(r.openTime)} – ${esc(r.closeTime)}</span></article>`).join("") : "<p>No resources found.</p>";
     }
-
-    async function loadResourcesForDate() {
-      const date = document.getElementById("resource-date").value;
-      if (!date) return window.alert("Please choose a date.");
-
-      try {
-        const resources = await CallResourceBYdate(date);
-        showResources(resources, date);
-      } catch (error) {
-        window.alert(error.message);
-      }
+    function renderBookings(target, list, cancellable = false) {
+      target.innerHTML = list.length ? list.map(b => `<article class="booking-row"><div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span><div><strong>${esc(b.resource?.name || "Removed resource")}</strong><span><i class="fa-solid fa-location-dot"></i>${esc(b.resource?.location || "")}</span></div></div><div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>${formatDate(b.date)}</strong><span>${b.startTime} – ${b.endTime}</span></div><span class="status">${esc(b.status)}</span>${cancellable && b.status === "confirmed" ? `<button class="more cancel-booking" data-booking-id="${b._id}" aria-label="Cancel booking">Cancel</button>` : ""}</article>`).join("") : "<p>No bookings yet. Choose a resource to get started.</p>";
     }
-
-    document.getElementById("resources-link").addEventListener("click", async (event) => {
-      event.preventDefault();
-      const today = new Date().toLocaleDateString("en-CA");
-      showResources([], today);
-      await loadResourcesForDate();
-    });
-   
+    function openPanel(title, content) {
+      $("#dashboard-content").innerHTML = `<section class="card popular" style="width:100%"><div class="card-title"><h2>${title}</h2><button class="text-link" id="back-dashboard">Back to dashboard</button></div>${content}</section>`;
+      $("#back-dashboard").onclick = () => location.reload();
+    }
+    async function showResources() {
+      const data = await api("/catalog/resources"); resources = data.resources;
+      openPanel("Resources", `<label class="search" style="max-width:320px;margin:16px 0"><i class="fa-solid fa-magnifying-glass"></i><input id="panel-search" placeholder="Search resources"></label><div id="panel-resources" class="resource-cards"></div>`);
+      const refresh = () => renderResources($("#panel-resources"), resources.filter(r => `${r.name} ${r.location} ${r.category}`.toLowerCase().includes($("#panel-search").value.toLowerCase())));
+      $("#panel-search").oninput = refresh; refresh();
+      $("#panel-resources").onclick = e => { const card = e.target.closest("[data-resource-id]"); if (card) openBooking(card.dataset.resourceId); };
+    }
+    async function showBookings() {
+      const data = await api("/bookings/me?status=all");
+      openPanel("My Bookings", `<div id="all-bookings"></div>`); renderBookings($("#all-bookings"), data.bookings, true);
+      $("#all-bookings").onclick = async e => { const button = e.target.closest(".cancel-booking"); if (button && confirm("Cancel this booking?")) { await api(`/bookings/${button.dataset.bookingId}/cancel`, { method: "PATCH" }); showBookings(); } };
+    }
+    async function openBooking(resourceId = "") {
+      if (!resources.length) resources = (await api("/catalog/resources")).resources;
+      const options = resources.map(r => `<option value="${r._id}" ${r._id === resourceId ? "selected" : ""}>${esc(r.name)} — ${esc(r.location)}</option>`).join("");
+      openPanel("Book a Resource", `<form id="booking-form" style="max-width:560px;display:grid;gap:14px;margin-top:18px"><label>Resource<select id="booking-resource" required>${options}</select></label><label>Date<input id="booking-date" type="date" min="${today()}" value="${today()}" required></label><div class="time-grid"><label>Start time<input id="booking-start" type="time" required></label><label>End time<input id="booking-end" type="time" required></label></div><label>Purpose (optional)<input id="booking-purpose" maxlength="300" placeholder="What will you use it for?"></label><p id="availability" style="margin:0;color:var(--muted)"></p><button class="primary-btn" type="submit">Confirm booking</button></form>`);
+      const form = $("#booking-form"), select = $("#booking-resource"), date = $("#booking-date");
+      const loadAvailability = async () => { try { const data = await api(`/resources/${select.value}/availability?date=${date.value}`); $("#availability").textContent = data.bookings.length ? `Already booked: ${data.bookings.map(b => `${b.startTime}–${b.endTime}`).join(", ")}` : `Available ${data.resource.openTime}–${data.resource.closeTime}`; $("#booking-start").min = data.resource.openTime; $("#booking-end").max = data.resource.closeTime; } catch (e) { $("#availability").textContent = e.message; } };
+      select.onchange = loadAvailability; date.onchange = loadAvailability; await loadAvailability();
+      form.onsubmit = async event => { event.preventDefault(); const button = form.querySelector("button"); button.disabled = true; try { await api("/bookings", { method: "POST", body: JSON.stringify({ resourceId: select.value, date: date.value, startTime: $("#booking-start").value, endTime: $("#booking-end").value, purpose: $("#booking-purpose").value }) }); alert("Booking confirmed."); location.reload(); } catch (e) { alert(e.message); button.disabled = false; } };
+    }
+    async function loadDashboard() {
+      const [me, dashboard, allResources] = await Promise.all([api("/me"), api("/dashboard"), api("/catalog/resources")]); resources = allResources.resources;
+      $("#profile-name").textContent = me.user.name; $("#profile-role").textContent = me.user.role === "admin" ? "Administrator" : "Student";
+      $("#greeting").textContent = `Welcome, ${me.user.name.split(" ")[0]}! 👋`; $("#booking-summary").textContent = dashboard.upcoming.length ? `You have ${dashboard.upcoming.length} upcoming booking${dashboard.upcoming.length === 1 ? "" : "s"}` : "Ready to book your next resource?";
+      $("#upcoming-count").textContent = dashboard.upcoming.length; $("#resource-count").textContent = dashboard.resources; $("#total-bookings").textContent = dashboard.total;
+      const next = dashboard.upcoming[0]; $("#next-reminder").textContent = next ? `${formatDate(next.date)} ${next.startTime}` : "—";
+      renderBookings($("#upcoming-bookings"), dashboard.upcoming); renderResources($("#popular-resources"), resources.slice(0, 5));
+      $("#reminders").innerHTML = next ? `<article class="reminder"><span class="reminder-icon"><i class="fa-regular fa-bell"></i></span><div><strong>${esc(next.resource?.name)}</strong><span>${formatDate(next.date)}, ${next.startTime}</span></div></article>` : "<p>No upcoming reminders.</p>";
+    }
+    $("#menu-toggle").onclick = () => $("#sidebar").classList.toggle("open");
+    document.querySelectorAll("[data-open-booking]").forEach(button => button.onclick = () => openBooking());
+    ["#resources-link", "#view-resources"].forEach(id => $(id).onclick = e => { e.preventDefault(); showResources().catch(e => alert(e.message)); });
+    ["#bookings-link", "#view-bookings", "#view-all-bookings", "#view-reminders", "#calendar-link"].forEach(id => $(id).onclick = e => { e.preventDefault(); showBookings().catch(e => alert(e.message)); });
+    $("#profile-link").onclick = e => { e.preventDefault(); api("/me").then(({user}) => openPanel("My Profile", `<p><strong>${esc(user.name)}</strong></p><p>${esc(user.email)}</p><p>Role: ${esc(user.role)}</p>`)); };
+    $("#logout-button").onclick = async () => { if (confirm("Log out of StudentDesk?")) { await api("/logout", { method: "POST" }); location.href = "index.html"; } };
+    $("#resource-search").oninput = () => { const q = $("#resource-search").value.toLowerCase(); renderResources($("#popular-resources"), resources.filter(r => `${r.name} ${r.location}`.toLowerCase().includes(q)).slice(0, 5)); };
+    loadDashboard().catch(error => alert(error.message));
   </script>
 </body>
 

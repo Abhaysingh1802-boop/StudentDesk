@@ -1,5 +1,5 @@
 const express = require("express");
-const { Resource, User } = require("./models");
+const { Resource, User, Booking } = require("./models");
 const { auth, adminOnly } = require("./middlewares/auth");
 const { patch } = require("./signup.js");
 
@@ -73,6 +73,27 @@ router.get("/resources", auth, async (req, res) => {
       message: error.message,
     });
   }
+});
+
+router.get("/admin/dashboard", auth, adminOnly, async (req, res) => {
+  try {
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+    const [resources, bookings, todayBookings, users, recentBookings] = await Promise.all([
+      Resource.countDocuments(),
+      Booking.countDocuments({ status: "confirmed" }),
+      Booking.countDocuments({ status: "confirmed", date: today }),
+      User.countDocuments({ role: "user" }),
+      Booking.find().populate("resource", "name location").populate("user", "name email").sort({ createdAt: -1 }).limit(10),
+    ]);
+    res.json({ resources, bookings, todayBookings, users, recentBookings });
+  } catch (error) { res.status(500).json({ message: "Unable to load admin dashboard" }); }
+});
+
+router.get("/admin/bookings", auth, adminOnly, async (req, res) => {
+  try {
+    const bookings = await Booking.find().populate("resource", "name location").populate("user", "name email").sort({ date: -1, startTime: -1 });
+    res.json({ bookings });
+  } catch (error) { res.status(500).json({ message: "Unable to load bookings" }); }
 });
 router.get("/AllUsers", auth, adminOnly, async (req, res) => {
   try {

@@ -697,7 +697,7 @@
         <ul class="nav">
           <li class="active"><a href="#"><i class="fa-solid fa-grid-2"></i>Dashboard</a></li>
           <li><a href="#"><i class="fa-solid fa-building"></i>Resources <span class="badge-count">25</span></a></li>
-          <li><a href="#"><i class="fa-regular fa-calendar-check"></i>Bookings <span class="badge-count">8</span></a>
+          <li><a href="#" id="admin-bookings-link"><i class="fa-regular fa-calendar-check"></i>Bookings <span class="badge-count" id="booking-badge">0</span></a>
           </li>
           <li><a href="users.html"><i class="fa-solid fa-users"></i>Users</a></li>
         </ul>
@@ -709,7 +709,7 @@
       <header>
         <div>
           <p class="eyebrow">Overview</p>
-          <h1>Good morning, Abhay</h1>
+          <h1 id="admin-greeting">Welcome</h1>
         </div>
         <div class="header-actions"><button class="icon-button" aria-label="Notifications"><i
               class="fa-regular fa-bell"></i></button>
@@ -725,25 +725,25 @@
           <article class="card stat" style="--accent:var(--blue)">
             <div class="stat-top"><span>Total resources</span><span class="stat-icon"><i
                   class="fa-solid fa-building"></i></span></div>
-            <p class="stat-number">25</p>
+            <p class="stat-number" id="admin-resource-count">—</p>
             <p class="trend"><strong>+12%</strong>from last month</p>
           </article>
           <article class="card stat" style="--accent:var(--green)">
             <div class="stat-top"><span>Total bookings</span><span class="stat-icon"><i
                   class="fa-regular fa-calendar-check"></i></span></div>
-            <p class="stat-number">41</p>
+            <p class="stat-number" id="admin-booking-count">—</p>
             <p class="trend"><strong>+8.4%</strong>from last month</p>
           </article>
           <article class="card stat" style="--accent:var(--amber)">
             <div class="stat-top"><span>Today's bookings</span><span class="stat-icon"><i
                   class="fa-solid fa-calendar-day"></i></span></div>
-            <p class="stat-number">8</p>
+            <p class="stat-number" id="admin-today-count">—</p>
             <p class="trend neutral"><strong>3 upcoming</strong>this afternoon</p>
           </article>
           <article class="card stat" style="--accent:var(--cyan)">
             <div class="stat-top"><span>Active users</span><span class="stat-icon"><i
                   class="fa-solid fa-users"></i></span></div>
-            <p class="stat-number">32</p>
+            <p class="stat-number" id="admin-user-count">—</p>
             <p class="trend"><strong>+5.1%</strong>from last month</p>
           </article>
         </section>
@@ -869,7 +869,7 @@
                   <th></th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="recentBookingsBody">
                 <tr>
                   <td><strong>Conference Hall A</strong></td>
                   <td>Abhay R.</td>
@@ -904,7 +904,27 @@
       </div>
       <script>
         // Relative paths use this same Render service in production and localhost in development.
-        const API_URL = "";
+        const API_URL = location.port === "3000" ? "" : `${location.protocol}//${location.hostname}:3000`;
+        const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+        const dateLabel = (date) => new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
+
+        async function loadAdminDashboard() {
+          const response = await fetch(`${API_URL}/admin/dashboard`, { credentials: "include" });
+          const data = await response.json().catch(() => ({}));
+          if (response.status === 401 || response.status === 403) { location.href = "index.html"; return; }
+          if (!response.ok) throw new Error(data.message || "Unable to load dashboard");
+          document.getElementById("admin-resource-count").textContent = data.resources;
+          document.getElementById("admin-booking-count").textContent = data.bookings;
+          document.getElementById("admin-today-count").textContent = data.todayBookings;
+          document.getElementById("admin-user-count").textContent = data.users;
+          document.getElementById("booking-badge").textContent = data.todayBookings;
+          const body = document.getElementById("recentBookingsBody");
+          body.innerHTML = data.recentBookings.length ? data.recentBookings.map(booking => `
+            <tr><td><strong>${escapeHtml(booking.resource?.name || "Deleted resource")}</strong></td>
+            <td>${escapeHtml(booking.user?.name || "Deleted user")}</td><td>${dateLabel(booking.date)}</td>
+            <td>${escapeHtml(booking.startTime)} – ${escapeHtml(booking.endTime)}</td>
+            <td><span class="tag ${booking.status === "confirmed" ? "active" : "pending"}">${escapeHtml(booking.status)}</span></td><td></td></tr>`).join("") : `<tr><td colspan="6">No bookings yet.</td></tr>`;
+        }
 
         async function callAddResource(resource) {
           const response = await fetch(`${API_URL}/AddResource`, {
@@ -999,6 +1019,7 @@
           try {
             await callAddResource(resource);
             await getAllResources();
+            await loadAdminDashboard();
             alert("Resource added successfully.");
             form.reset();
             document.getElementById("isActive").checked = true;
@@ -1018,11 +1039,13 @@
           try {
             await callDelete(id);
             await getAllResources();
+            await loadAdminDashboard();
           } catch (error) {
             alert(error.message);
           }
         });
         document.addEventListener("DOMContentLoaded", () => {
+          loadAdminDashboard().catch((error) => alert(error.message));
           getAllResources().catch((error) => {
             document.getElementById("resourcesTableBody").innerHTML = `
               <tr>

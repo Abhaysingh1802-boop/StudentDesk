@@ -82,8 +82,24 @@ const resourceSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const bookingSchema = new mongoose.Schema(
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    resource: { type: mongoose.Schema.Types.ObjectId, ref: "Resource", required: true, index: true },
+    date: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/, index: true },
+    startTime: { type: String, required: true, match: /^\d{2}:\d{2}$/ },
+    endTime: { type: String, required: true, match: /^\d{2}:\d{2}$/ },
+    status: { type: String, enum: ["confirmed", "cancelled"], default: "confirmed", index: true },
+    purpose: { type: String, trim: true, maxlength: 300, default: "" },
+  },
+  { timestamps: true }
+);
+
+bookingSchema.index({ resource: 1, date: 1, startTime: 1, endTime: 1 });
+
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 const Otp = mongoose.models.Otp || mongoose.model("Otp", otpSchema);
 const Resource = mongoose.models.Resource || mongoose.model("Resource", resourceSchema);
+const Booking = mongoose.models.Booking || mongoose.model("Booking", bookingSchema);
 
-module.exports = { User, Otp, Resource };
+module.exports = { User, Otp, Resource, Booking };
