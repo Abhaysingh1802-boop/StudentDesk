@@ -1094,7 +1094,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="brand"><span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>CampusDesk</div>
       <nav class="nav">
-        <a class="active" href="#"><i class="fa-solid fa-house"></i>Dashboard</a>
+        <a class="active" href="#" id="dashboard-link"><i class="fa-solid fa-house"></i>Dashboard</a>
         <a href="#" id="resources-link"><i class="fa-regular fa-book-open"></i>Resources</a>
         <a href="#" id="bookings-link"><i class="fa-regular fa-calendar-check"></i>My Bookings</a>
         <a href="#" id="calendar-link"><i class="fa-regular fa-calendar"></i>Calendar</a>
@@ -1351,6 +1351,7 @@
     }
     $("#menu-toggle").onclick = () => $("#sidebar").classList.toggle("open");
     document.querySelectorAll("[data-open-booking]").forEach(button => button.onclick = () => openBooking());
+    $("#dashboard-link").onclick = e => { e.preventDefault(); location.reload(); };
     ["#resources-link", "#view-resources"].forEach(id => $(id).onclick = e => { e.preventDefault(); showResources().catch(e => alert(e.message)); });
     ["#bookings-link", "#view-bookings", "#view-all-bookings", "#view-reminders", "#calendar-link"].forEach(id => $(id).onclick = e => { e.preventDefault(); showBookings().catch(e => alert(e.message)); });
     $("#profile-link").onclick = e => { e.preventDefault(); api("/me").then(({user}) => openPanel("My Profile", `<p><strong>${esc(user.name)}</strong></p><p>${esc(user.email)}</p><p>Role: ${esc(user.role)}</p>`)); };
