@@ -533,37 +533,116 @@
       margin: 0 4px 19px;
     }
 
+    .panel-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      margin: 16px 0 20px;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      height: 38px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: #fff;
+      color: #51607a;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .chip:hover {
+      border-color: #bfe0de;
+    }
+
+    .chip.active {
+      color: #fff;
+      background: linear-gradient(110deg, #006a69, #008484);
+      border-color: transparent;
+    }
+
     .resource-cards {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 7px;
+      grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+      gap: 12px;
     }
 
     .resource-card {
-      min-height: 116px;
-      padding: 16px 12px;
-      text-align: center;
+      position: relative;
+      min-height: 148px;
+      padding: 18px 16px 16px;
+      text-align: left;
       border: 1px solid #e8edef;
-      border-radius: 10px;
+      border-radius: 12px;
+      background: #fff;
       box-shadow: 0 3px 8px #0a203108;
+      transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
+      cursor: pointer;
+    }
+
+    .resource-card:hover {
+      border-color: #bfe0de;
+      box-shadow: 0 8px 20px #0a203114;
+      transform: translateY(-2px);
+    }
+
+    .resource-card-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+
+    .resource-card-badge.open {
+      color: #0a8a52;
+      background: #e6f7ee;
+    }
+
+    .resource-card-badge.closed {
+      color: #b3261e;
+      background: #fdecec;
     }
 
     .resource-card i {
       display: block;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       color: #005e60;
-      font-size: 25px;
+      font-size: 22px;
     }
 
     .resource-card strong {
       display: block;
-      font-size: 13px;
-      white-space: nowrap;
+      font-size: 14px;
+      line-height: 1.3;
+      padding-right: 46px;
+    }
+
+    .resource-card-tag {
+      display: inline-block;
+      margin-top: 9px;
+      padding: 2px 9px;
+      border-radius: 20px;
+      background: #eef2f5;
+      color: #51607a;
+      font-size: 11px;
+      font-weight: 600;
     }
 
     .resource-card span {
       display: block;
-      margin-top: 10px;
+      margin-top: 8px;
       color: #5d687e;
       font-size: 12px;
       white-space: nowrap;
@@ -571,7 +650,7 @@
 
     .resource-card span i {
       display: inline;
-      margin: 0 4px 0 0;
+      margin: 0 5px 0 0;
       color: inherit;
       font-size: 11px;
     }
@@ -1235,8 +1314,23 @@
     }
     const formatDate = (date) => new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
     const resourceIcon = (category) => category === "equipment" ? "fa-display" : category === "hall" ? "fa-building" : "fa-door-open";
+    const categoryLabel = (category) => category === "equipment" ? "Equipment" : category === "hall" ? "Hall" : "Room";
+    const isOpenNow = (open, close) => {
+      const now = new Date().toLocaleTimeString("en-GB", { hour12: false, timeZone: "Asia/Kolkata" }).slice(0, 5);
+      return now >= open && now <= close;
+    };
     function renderResources(target, list) {
-      target.innerHTML = list.length ? list.map(r => `<article class="resource-card" data-resource-id="${r._id}"><i class="fa-solid ${resourceIcon(r.category)}"></i><strong>${esc(r.name)}</strong><span><i class="fa-solid fa-location-dot"></i>${esc(r.location)}</span><span>${esc(r.openTime)} – ${esc(r.closeTime)}</span></article>`).join("") : "<p>No resources found.</p>";
+      target.innerHTML = list.length ? list.map(r => {
+        const open = isOpenNow(r.openTime, r.closeTime);
+        return `<article class="resource-card" data-resource-id="${r._id}">
+          <span class="resource-card-badge ${open ? "open" : "closed"}">${open ? "Open now" : "Closed"}</span>
+          <i class="fa-solid ${resourceIcon(r.category)}"></i>
+          <strong>${esc(r.name)}</strong>
+          <span class="resource-card-tag">${categoryLabel(r.category)}</span>
+          <span><i class="fa-solid fa-location-dot"></i>${esc(r.location)}</span>
+          <span><i class="fa-regular fa-clock"></i>${esc(r.openTime)} – ${esc(r.closeTime)}</span>${r.capacity ? `<span><i class="fa-solid fa-users"></i>Fits ${r.capacity}</span>` : ""}
+        </article>`;
+      }).join("") : "<p>No resources found.</p>";
     }
     function renderBookings(target, list, cancellable = false) {
       target.innerHTML = list.length ? list.map(b => `<article class="booking-row"><div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span><div><strong>${esc(b.resource?.name || "Removed resource")}</strong><span><i class="fa-solid fa-location-dot"></i>${esc(b.resource?.location || "")}</span></div></div><div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>${formatDate(b.date)}</strong><span>${b.startTime} – ${b.endTime}</span></div><span class="status">${esc(b.status)}</span>${cancellable && b.status === "confirmed" ? `<button class="more cancel-booking" data-booking-id="${b._id}" aria-label="Cancel booking">Cancel</button>` : ""}</article>`).join("") : "<p>No bookings yet. Choose a resource to get started.</p>";
@@ -1247,9 +1341,15 @@
     }
     async function showResources() {
       const data = await api("/catalog/resources"); resources = data.resources;
-      openPanel("Resources", `<label class="search" style="max-width:320px;margin:16px 0"><i class="fa-solid fa-magnifying-glass"></i><input id="panel-search" placeholder="Search resources"></label><div id="panel-resources" class="resource-cards"></div>`);
-      const refresh = () => renderResources($("#panel-resources"), resources.filter(r => `${r.name} ${r.location} ${r.category}`.toLowerCase().includes($("#panel-search").value.toLowerCase())));
+      let activeFilter = "all";
+      openPanel("Resources", `<div class="panel-toolbar"><label class="search" style="max-width:320px;flex:1"><i class="fa-solid fa-magnifying-glass"></i><input id="panel-search" placeholder="Search resources"></label><div class="filter-chips" id="panel-filters"><button class="chip active" data-filter="all">All</button><button class="chip" data-filter="hall">Halls</button><button class="chip" data-filter="room">Rooms</button><button class="chip" data-filter="equipment">Equipment</button></div></div><div id="panel-resources" class="resource-cards"></div>`);
+      const refresh = () => renderResources($("#panel-resources"), resources.filter(r => (activeFilter === "all" || r.category === activeFilter) && `${r.name} ${r.location} ${r.category}`.toLowerCase().includes($("#panel-search").value.toLowerCase())));
       $("#panel-search").oninput = refresh; refresh();
+      $("#panel-filters").onclick = e => {
+        const chip = e.target.closest(".chip"); if (!chip) return;
+        $("#panel-filters").querySelectorAll(".chip").forEach(c => c.classList.remove("active")); chip.classList.add("active");
+        activeFilter = chip.dataset.filter; refresh();
+      };
       $("#panel-resources").onclick = e => { const card = e.target.closest("[data-resource-id]"); if (card) openBooking(card.dataset.resourceId); };
     }
     async function showBookings() {
