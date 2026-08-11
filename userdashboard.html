@@ -1364,9 +1364,7 @@
         <a class="active" href="#" id="dashboard-link"><i class="fa-solid fa-house"></i>Dashboard</a>
         <a href="#" id="resources-link"><i class="fa-regular fa-book-open"></i>Resources</a>
         <a href="#" id="bookings-link"><i class="fa-regular fa-calendar-check"></i>My Bookings</a>
-        <a href="#" id="calendar-link"><i class="fa-regular fa-calendar"></i>Calendar</a>
         <a href="#" id="profile-link"><i class="fa-regular fa-user"></i>Profile</a>
-        <a href="#" id="sidebar-notifications-link"><i class="fa-regular fa-bell"></i>Notifications</a>
       </nav>
       <section class="help-card">
         <div class="help-icon"><i class="fa-regular fa-calendar-check"></i></div>
@@ -1432,34 +1430,8 @@
             <div class="card-title">
               <h2>My Upcoming Bookings</h2><button class="text-link" id="view-all-bookings">View all</button>
             </div>
-            <div id="upcoming-bookings"><p>Loading bookings...</p></div><!--
-            <article class="booking-row">
-              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
-                <div><strong>Seminar Hall A</strong><span><i class="fa-solid fa-location-dot"></i>Main Campus</span>
-                </div>
-              </div>
-              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Tomorrow</strong><span>14:00 -
-                  16:00</span></div><span class="status">Confirmed</span><button class="more"
-                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-            </article>
-            <article class="booking-row">
-              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
-                <div><strong>Music Room</strong><span><i class="fa-solid fa-location-dot"></i>Main Campus</span></div>
-              </div>
-              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Tomorrow</strong><span>16:30 -
-                  18:30</span></div><span class="status">Confirmed</span><button class="more"
-                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-            </article>
-            <article class="booking-row">
-              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
-                <div><strong>Projector (AV Lab)</strong><span><i class="fa-solid fa-location-dot"></i>AV Lab</span>
-                </div>
-              </div>
-              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Friday, 17 May</strong><span>10:00 -
-                  12:00</span></div><span class="status">Confirmed</span><button class="more"
-                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-            </article>
-            -->
+            <div id="upcoming-bookings"><p>Loading bookings...</p></div>
+         
             <div class="notice"><i class="fa-solid fa-circle-info"></i>You'll see your next booking here, with a reminder before it starts.</div>
           </section>
           <section class="card popular">
@@ -1683,7 +1655,7 @@
     document.querySelectorAll("[data-open-booking]").forEach(button => button.onclick = () => openBooking());
     $("#dashboard-link").onclick = e => { e.preventDefault(); location.reload(); };
     ["#resources-link", "#view-resources"].forEach(id => $(id).onclick = e => { e.preventDefault(); showResources().catch(e => alert(e.message)); });
-    ["#bookings-link", "#view-bookings", "#view-all-bookings", "#view-reminders", "#calendar-link", "#reminders-view-all"].forEach(id => $(id).onclick = e => { e.preventDefault(); showBookings().catch(e => alert(e.message)); });
+    ["#bookings-link", "#view-bookings", "#view-all-bookings", "#view-reminders", "#reminders-view-all"].forEach(id => $(id).onclick = e => { e.preventDefault(); showBookings().catch(e => alert(e.message)); });
     $("#profile-link").onclick = e => { e.preventDefault(); api("/me").then(({user}) => openPanel("My Profile", `<p><strong>${esc(user.name)}</strong></p><p>${esc(user.email)}</p><p>Role: ${esc(user.role)}</p>`)); };
     $("#profile-toggle").onclick = e => { e.stopPropagation(); $("#profile-menu").classList.toggle("open"); $("#notif-panel").classList.remove("open"); };
     $("#profile-menu-profile").onclick = () => { $("#profile-menu").classList.remove("open"); $("#profile-link").click(); };
@@ -1693,7 +1665,6 @@
     $("#logout-modal").onclick = e => { if (e.target.id === "logout-modal") $("#logout-modal").style.display = "none"; };
     $("#logout-confirm").onclick = async () => { await api("/logout", { method: "POST" }); location.href = "index.html"; };
     $("#notif-button").onclick = e => { e.stopPropagation(); $("#notif-panel").classList.toggle("open"); $("#profile-menu").classList.remove("open"); };
-    $("#sidebar-notifications-link").onclick = e => { e.preventDefault(); $("#notif-panel").classList.toggle("open"); $("#sidebar").classList.remove("open"); };
     $("#notif-panel-list").onclick = e => { const item = e.target.closest("[data-open-booking-view]"); if (item) { e.preventDefault(); $("#notif-panel").classList.remove("open"); showBookings().catch(err => alert(err.message)); } };
     document.addEventListener("click", e => {
       if (!e.target.closest(".notif-wrap")) $("#notif-panel").classList.remove("open");
