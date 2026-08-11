@@ -741,6 +741,194 @@
       white-space: nowrap;
     }
 
+    .notif-wrap {
+      position: relative;
+    }
+
+    .notif-panel {
+      position: absolute;
+      top: calc(100% + 14px);
+      right: 0;
+      width: 320px;
+      max-height: 380px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 14px 34px #10274422;
+      padding: 8px;
+      display: none;
+      z-index: 40;
+    }
+
+    .notif-panel.open {
+      display: block;
+    }
+
+    .notif-panel-title {
+      padding: 10px 10px 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .notif-panel-item {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .notif-panel-item:hover {
+      background: var(--soft);
+    }
+
+    .notif-panel-item strong,
+    .notif-panel-item span {
+      display: block;
+    }
+
+    .notif-panel-item span {
+      margin-top: 3px;
+      color: #536079;
+      font-size: 12.5px;
+    }
+
+    .notif-panel-empty {
+      padding: 22px 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .profile-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 17px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .profile-menu {
+      position: absolute;
+      top: calc(100% + 14px);
+      right: 0;
+      min-width: 210px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 14px 34px #10274422;
+      padding: 8px;
+      display: none;
+      z-index: 40;
+    }
+
+    .profile-menu.open {
+      display: block;
+    }
+
+    .profile-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      background: transparent;
+      border: 0;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .profile-menu-item i {
+      width: 16px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .profile-menu-item:hover {
+      background: var(--soft);
+    }
+
+    .profile-menu-item.danger {
+      color: #be123c;
+    }
+
+    .profile-menu-item.danger i {
+      color: #be123c;
+    }
+
+    .profile-menu-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 5px 4px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: #0f172acc;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      z-index: 60;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 360px;
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .modal-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .modal-card p {
+      margin: 0 0 22px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .modal-actions button {
+      flex: 1;
+      height: 44px;
+      border: 0;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .modal-actions .ghost-btn {
+      background: var(--soft);
+      color: var(--ink);
+    }
+
+    .modal-actions .danger-btn {
+      background: #be123c;
+      color: #fff;
+    }
+
     .booking-panel {
       background: #fff;
       border: 1px solid #edf3f2;
@@ -1178,7 +1366,7 @@
         <a href="#" id="bookings-link"><i class="fa-regular fa-calendar-check"></i>My Bookings</a>
         <a href="#" id="calendar-link"><i class="fa-regular fa-calendar"></i>Calendar</a>
         <a href="#" id="profile-link"><i class="fa-regular fa-user"></i>Profile</a>
-        <a href="#"><i class="fa-regular fa-bell"></i>Notifications</a>
+        <a href="#" id="sidebar-notifications-link"><i class="fa-regular fa-bell"></i>Notifications</a>
       </nav>
       <section class="help-card">
         <div class="help-icon"><i class="fa-regular fa-calendar-check"></i></div>
@@ -1191,11 +1379,26 @@
         <button class="menu-toggle" id="menu-toggle" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
         <label class="search"><i class="fa-solid fa-magnifying-glass"></i><input type="search"
             placeholder="Search resources..." id="resource-search"></label>
-        <div class="profile"><button class="notification" aria-label="Notifications"><i
-              class="fa-regular fa-bell"></i><b>3</b></button>
-          <div class="avatar"><i class="fa-regular fa-user"></i></div>
-          <div class="profile-copy"><strong id="profile-name">Student</strong><span id="profile-role">Student</span></div><button class="chevron" id="logout-button"
-            aria-label="Profile options"><i class="fa-solid fa-chevron-down"></i></button>
+        <div class="profile">
+          <div class="notif-wrap">
+            <button class="notification" id="notif-button" aria-label="Notifications" aria-haspopup="true"><i
+                class="fa-regular fa-bell"></i><b id="notif-badge" style="display:none">0</b></button>
+            <div class="notif-panel" id="notif-panel">
+              <p class="notif-panel-title">Upcoming reminders</p>
+              <div id="notif-panel-list"><p class="notif-panel-empty">No upcoming reminders.</p></div>
+            </div>
+          </div>
+          <div class="profile-wrap" id="profile-toggle" aria-haspopup="true">
+            <div class="avatar"><i class="fa-regular fa-user"></i></div>
+            <div class="profile-copy"><strong id="profile-name">Student</strong><span id="profile-role">Student</span></div>
+            <button class="chevron" tabindex="-1" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></button>
+            <div class="profile-menu" id="profile-menu">
+              <button class="profile-menu-item" type="button" id="profile-menu-profile"><i class="fa-regular fa-user"></i>My profile</button>
+              <button class="profile-menu-item" type="button" id="profile-menu-bookings"><i class="fa-regular fa-calendar-check"></i>My bookings</button>
+              <div class="profile-menu-divider"></div>
+              <button class="profile-menu-item danger" type="button" id="profile-menu-logout"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log out</button>
+            </div>
+          </div>
         </div>
       </header>
       <div class="dashboard" id="dashboard-content">
@@ -1285,18 +1488,23 @@
           </section>
           <section class="card reminders">
             <div class="card-title">
-              <h2>Upcoming Reminders</h2><button class="text-link">View all</button>
+              <h2>Upcoming Reminders</h2><button class="text-link" id="reminders-view-all">View all</button>
             </div>
-            <article class="reminder"><span class="reminder-icon"><i class="fa-regular fa-bell"></i></span>
-              <div><strong>Seminar Hall A</strong><span>Tomorrow, 13:00</span></div><b class="time-badge">1h</b>
-            </article>
-            <article class="reminder"><span class="reminder-icon"><i class="fa-regular fa-bell"></i></span>
-              <div><strong>Music Room</strong><span>Tomorrow, 15:30</span></div><b class="time-badge">3h 30m</b>
-            </article>
+            <div id="reminders"><p>Loading reminders...</p></div>
           </section>
         </aside>
       </div>
     </main>
+  </div>
+  <div class="modal-overlay" id="logout-modal" style="display:none">
+    <div class="modal-card">
+      <h3>Log out</h3>
+      <p>You'll need to sign in again to access your dashboard.</p>
+      <div class="modal-actions">
+        <button class="ghost-btn" type="button" id="logout-cancel">Cancel</button>
+        <button class="danger-btn" type="button" id="logout-confirm">Log out</button>
+      </div>
+    </div>
   </div>
   <script>
     const API_URL = "";
@@ -1313,6 +1521,27 @@
       return data;
     }
     const formatDate = (date) => new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    function timeUntilLabel(date, startTime) {
+      const target = new Date(`${date}T${startTime}:00+05:30`).getTime();
+      const minutes = Math.round((target - Date.now()) / 60000);
+      if (minutes <= 0) return "Now";
+      if (minutes < 60) return `${minutes}m`;
+      const hours = Math.floor(minutes / 60), rest = minutes % 60;
+      if (hours < 24) return rest ? `${hours}h ${rest}m` : `${hours}h`;
+      return formatDate(date);
+    }
+    function renderReminderRows(list, limit) {
+      const items = limit ? list.slice(0, limit) : list;
+      if (!items.length) return "";
+      return items.map(b => `<article class="reminder"><span class="reminder-icon"><i class="fa-regular fa-bell"></i></span><div><strong>${esc(b.resource?.name || "Removed resource")}</strong><span>${formatDate(b.date)}, ${esc(b.startTime)}</span></div><b class="time-badge">${timeUntilLabel(b.date, b.startTime)}</b></article>`).join("");
+    }
+    function renderNotifPanel(list) {
+      const items = list.slice(0, 6);
+      $("#notif-panel-list").innerHTML = items.length ? items.map(b => `<a class="notif-panel-item" href="#" data-open-booking-view><span class="reminder-icon"><i class="fa-regular fa-bell"></i></span><div><strong>${esc(b.resource?.name || "Removed resource")}</strong><span>${formatDate(b.date)}, ${esc(b.startTime)} · in ${timeUntilLabel(b.date, b.startTime)}</span></div></a>`).join("") : `<p class="notif-panel-empty">No upcoming reminders.</p>`;
+      const badge = $("#notif-badge");
+      if (list.length) { badge.style.display = "grid"; badge.textContent = list.length > 9 ? "9+" : list.length; }
+      else badge.style.display = "none";
+    }
     const resourceIcon = (category) => category === "equipment" ? "fa-display" : category === "hall" ? "fa-building" : "fa-door-open";
     const categoryLabel = (category) => category === "equipment" ? "Equipment" : category === "hall" ? "Hall" : "Room";
     const isOpenNow = (open, close) => {
@@ -1447,15 +1676,29 @@
       $("#upcoming-count").textContent = dashboard.upcoming.length; $("#resource-count").textContent = dashboard.resources; $("#total-bookings").textContent = dashboard.total;
       const next = dashboard.upcoming[0]; $("#next-reminder").textContent = next ? `${formatDate(next.date)} ${next.startTime}` : "—";
       renderBookings($("#upcoming-bookings"), dashboard.upcoming); renderResources($("#popular-resources"), resources.slice(0, 5));
-      $("#reminders").innerHTML = next ? `<article class="reminder"><span class="reminder-icon"><i class="fa-regular fa-bell"></i></span><div><strong>${esc(next.resource?.name)}</strong><span>${formatDate(next.date)}, ${next.startTime}</span></div></article>` : "<p>No upcoming reminders.</p>";
+      $("#reminders").innerHTML = renderReminderRows(dashboard.upcoming, 3) || "<p>No upcoming reminders.</p>";
+      renderNotifPanel(dashboard.upcoming);
     }
     $("#menu-toggle").onclick = () => $("#sidebar").classList.toggle("open");
     document.querySelectorAll("[data-open-booking]").forEach(button => button.onclick = () => openBooking());
     $("#dashboard-link").onclick = e => { e.preventDefault(); location.reload(); };
     ["#resources-link", "#view-resources"].forEach(id => $(id).onclick = e => { e.preventDefault(); showResources().catch(e => alert(e.message)); });
-    ["#bookings-link", "#view-bookings", "#view-all-bookings", "#view-reminders", "#calendar-link"].forEach(id => $(id).onclick = e => { e.preventDefault(); showBookings().catch(e => alert(e.message)); });
+    ["#bookings-link", "#view-bookings", "#view-all-bookings", "#view-reminders", "#calendar-link", "#reminders-view-all"].forEach(id => $(id).onclick = e => { e.preventDefault(); showBookings().catch(e => alert(e.message)); });
     $("#profile-link").onclick = e => { e.preventDefault(); api("/me").then(({user}) => openPanel("My Profile", `<p><strong>${esc(user.name)}</strong></p><p>${esc(user.email)}</p><p>Role: ${esc(user.role)}</p>`)); };
-    $("#logout-button").onclick = async () => { if (confirm("Log out of StudentDesk?")) { await api("/logout", { method: "POST" }); location.href = "index.html"; } };
+    $("#profile-toggle").onclick = e => { e.stopPropagation(); $("#profile-menu").classList.toggle("open"); $("#notif-panel").classList.remove("open"); };
+    $("#profile-menu-profile").onclick = () => { $("#profile-menu").classList.remove("open"); $("#profile-link").click(); };
+    $("#profile-menu-bookings").onclick = () => { $("#profile-menu").classList.remove("open"); showBookings().catch(e => alert(e.message)); };
+    $("#profile-menu-logout").onclick = () => { $("#profile-menu").classList.remove("open"); $("#logout-modal").style.display = "grid"; };
+    $("#logout-cancel").onclick = () => { $("#logout-modal").style.display = "none"; };
+    $("#logout-modal").onclick = e => { if (e.target.id === "logout-modal") $("#logout-modal").style.display = "none"; };
+    $("#logout-confirm").onclick = async () => { await api("/logout", { method: "POST" }); location.href = "index.html"; };
+    $("#notif-button").onclick = e => { e.stopPropagation(); $("#notif-panel").classList.toggle("open"); $("#profile-menu").classList.remove("open"); };
+    $("#sidebar-notifications-link").onclick = e => { e.preventDefault(); $("#notif-panel").classList.toggle("open"); $("#sidebar").classList.remove("open"); };
+    $("#notif-panel-list").onclick = e => { const item = e.target.closest("[data-open-booking-view]"); if (item) { e.preventDefault(); $("#notif-panel").classList.remove("open"); showBookings().catch(err => alert(err.message)); } };
+    document.addEventListener("click", e => {
+      if (!e.target.closest(".notif-wrap")) $("#notif-panel").classList.remove("open");
+      if (!e.target.closest(".profile-wrap")) $("#profile-menu").classList.remove("open");
+    });
     $("#resource-search").oninput = () => { const q = $("#resource-search").value.toLowerCase(); renderResources($("#popular-resources"), resources.filter(r => `${r.name} ${r.location}`.toLowerCase().includes(q)).slice(0, 5)); };
     loadDashboard().catch(error => alert(error.message));
   </script>

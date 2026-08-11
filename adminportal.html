@@ -877,15 +877,18 @@
         <p class="nav-label">Workspace</p>
         <ul class="nav">
           <li class="active"><a href="#"><i class="fa-solid fa-grid-2"></i>Dashboard</a></li>
-          <li><a href="#"><i class="fa-solid fa-building"></i>Resources <span class="badge-count" id="resource-badge">0</span></a></li>
-          <li><a href="bookings.html" id="admin-bookings-link"><i class="fa-regular fa-calendar-check"></i>Bookings <span class="badge-count" id="booking-badge">0</span></a>
+          <li><a href="#"><i class="fa-solid fa-building"></i>Resources <span class="badge-count"
+                id="resource-badge">0</span></a></li>
+          <li><a href="bookings.html" id="admin-bookings-link"><i class="fa-regular fa-calendar-check"></i>Bookings
+              <span class="badge-count" id="booking-badge">0</span></a>
           </li>
           <li><a href="users.html"><i class="fa-solid fa-users"></i>Users</a></li>
         </ul>
       </div>
       <div class="side-bottom">
         <a class="help" href="#"><i class="fa-regular fa-circle-question"></i>Help &amp; support</a>
-        <button class="logout-link" type="button" id="sidebarLogout"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log out</button>
+        <button class="logout-link" type="button" id="sidebarLogout"><i
+            class="fa-solid fa-arrow-right-from-bracket"></i>Log out</button>
       </div>
     </aside>
     <main class="main">
@@ -896,7 +899,8 @@
           <p class="card-subtitle" id="admin-greeting-sub" style="margin-top:4px"></p>
         </div>
         <div class="header-actions">
-          <button class="icon-button" id="notifButton" aria-label="Notifications" aria-haspopup="true"><i class="fa-regular fa-bell"></i><span class="dot" id="notifDot"></span></button>
+          <button class="icon-button" id="notifButton" aria-label="Notifications" aria-haspopup="true"><i
+              class="fa-regular fa-bell"></i><span class="dot" id="notifDot"></span></button>
           <div class="dropdown-menu wide" id="notifMenu" aria-label="Notifications panel">
             <div id="notifList">
               <div class="notif-empty">No new notifications</div>
@@ -904,13 +908,15 @@
           </div>
           <div class="profile" id="profileToggle" aria-haspopup="true">
             <div class="avatar" id="profile-avatar">A</div>
-            <div><span class="profile-name" id="profile-name-text">Admin</span><span class="profile-role">Administrator</span></div><i
-              class="fa-solid fa-chevron-down" style="font-size:11px;color:var(--muted)"></i>
+            <div><span class="profile-name" id="profile-name-text">Admin</span><span
+                class="profile-role">Administrator</span></div><i class="fa-solid fa-chevron-down"
+              style="font-size:11px;color:var(--muted)"></i>
             <div class="dropdown-menu" id="profileMenu">
               <a class="dropdown-item" href="users.html"><i class="fa-solid fa-users"></i>Manage users</a>
               <a class="dropdown-item" href="bookings.html"><i class="fa-regular fa-calendar-check"></i>Bookings</a>
               <div class="dropdown-divider"></div>
-              <button class="dropdown-item danger" type="button" id="profileLogout"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log out</button>
+              <button class="dropdown-item danger" type="button" id="profileLogout"><i
+                  class="fa-solid fa-arrow-right-from-bracket"></i>Log out</button>
             </div>
           </div>
         </div>
@@ -921,13 +927,13 @@
             <div class="stat-top"><span>Total resources</span><span class="stat-icon"><i
                   class="fa-solid fa-building"></i></span></div>
             <p class="stat-number" id="admin-resource-count">—</p>
-           
+
           </article>
           <article class="card stat" style="--accent:var(--green)">
             <div class="stat-top"><span>Total bookings</span><span class="stat-icon"><i
                   class="fa-regular fa-calendar-check"></i></span></div>
             <p class="stat-number" id="admin-booking-count">—</p>
-          
+
           </article>
           <article class="card stat" style="--accent:var(--amber)">
             <div class="stat-top"><span>Today's bookings</span><span class="stat-icon"><i
@@ -939,7 +945,7 @@
             <div class="stat-top"><span>Active users</span><span class="stat-icon"><i
                   class="fa-solid fa-users"></i></span></div>
             <p class="stat-number" id="admin-user-count">—</p>
-         
+
           </article>
         </section>
         <section class="workspace">
@@ -951,13 +957,15 @@
               </div>
             </div>
             <div class="toolbar"><input class="field search" id="resourceSearch" aria-label="Search resources"
-                placeholder="Search resources..."><select class="field" id="resourceCategoryFilter" aria-label="Filter category">
+                placeholder="Search resources..."><select class="field" id="resourceCategoryFilter"
+                aria-label="Filter category">
                 <option value="all">All categories</option>
                 <option value="hall">Hall</option>
                 <option value="equipment">Equipment</option>
                 <option value="room">Room</option>
                 <option value="other">Other</option>
-              </select><button class="primary" id="focusAddResource" type="button"><i class="fa-solid fa-plus"></i> Add resource</button></div>
+              </select><button class="primary" id="focusAddResource" type="button"><i class="fa-solid fa-plus"></i> Add
+                resource</button></div>
             <div class="table-wrap">
               <table>
                 <thead>
@@ -1042,7 +1050,8 @@
         <div class="modal">
           <div class="modal-header">
             <h2>Edit resource</h2>
-            <button class="table-btn" type="button" id="closeEditModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <button class="table-btn" type="button" id="closeEditModal" aria-label="Close"><i
+                class="fa-solid fa-xmark"></i></button>
           </div>
           <form id="editResourceForm">
             <input type="hidden" id="edit-id">
@@ -1053,13 +1062,17 @@
                 <option value="room">Room</option>
                 <option value="other">Other</option>
               </select></div>
-            <div class="form-group"><label for="edit-description">Description</label><textarea id="edit-description" required></textarea></div>
+            <div class="form-group"><label for="edit-description">Description</label><textarea id="edit-description"
+                required></textarea></div>
             <div class="form-group"><label for="edit-location">Location</label><input id="edit-location" required></div>
             <div class="time-grid">
-              <div class="form-group"><label for="edit-open">Open time</label><input id="edit-open" type="time" required></div>
-              <div class="form-group"><label for="edit-close">Close time</label><input id="edit-close" type="time" required></div>
+              <div class="form-group"><label for="edit-open">Open time</label><input id="edit-open" type="time"
+                  required></div>
+              <div class="form-group"><label for="edit-close">Close time</label><input id="edit-close" type="time"
+                  required></div>
             </div>
-            <div class="toggle"><span>Resource is active</span><input id="edit-isActive" class="switch" type="checkbox"></div>
+            <div class="toggle"><span>Resource is active</span><input id="edit-isActive" class="switch" type="checkbox">
+            </div>
             <button type="submit" class="primary save">Save changes</button>
           </form>
         </div>
@@ -1069,12 +1082,16 @@
         <div class="modal" style="max-width:360px">
           <div class="modal-header">
             <h2>Log out</h2>
-            <button class="table-btn" type="button" id="closeLogoutModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            <button class="table-btn" type="button" id="closeLogoutModal" aria-label="Close"><i
+                class="fa-solid fa-xmark"></i></button>
           </div>
-          <p class="card-subtitle" style="margin-bottom:18px">You'll need to sign in again to access the admin portal.</p>
+          <p class="card-subtitle" style="margin-bottom:18px">You'll need to sign in again to access the admin portal.
+          </p>
           <div style="display:flex;gap:10px">
-            <button class="primary" type="button" id="cancelLogout" style="flex:1;background:var(--panel-2);color:var(--text)">Cancel</button>
-            <button class="primary" type="button" id="confirmLogout" style="flex:1;background:var(--red)">Log out</button>
+            <button class="primary" type="button" id="cancelLogout"
+              style="flex:1;background:var(--panel-2);color:var(--text)">Cancel</button>
+            <button class="primary" type="button" id="confirmLogout" style="flex:1;background:var(--red)">Log
+              out</button>
           </div>
         </div>
       </div>
@@ -1460,7 +1477,7 @@
         });
 
         document.addEventListener("DOMContentLoaded", () => {
-          loadAdminProfile().catch(() => {});
+          loadAdminProfile().catch(() => { });
           loadAdminDashboard().catch((error) => alert(error.message));
           fetchResources().catch((error) => {
             document.getElementById("resourcesTableBody").innerHTML = `
