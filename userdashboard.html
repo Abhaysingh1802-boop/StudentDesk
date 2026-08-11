@@ -1529,6 +1529,10 @@
     const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
     let resources = [];
     let upcomingBookings = []; // cached from the last /dashboard fetch, reused by the countdown refresher
+    // True once a booking's end time is in the past (backend only filters by
+    // date, so a booking that started/ended earlier today still counts as
+    // "today's booking" — this catches that on the client).
+    const isBookingOver = (booking) => new Date(`${booking.date}T${booking.endTime}:00+05:30`).getTime() <= Date.now();
 
     // Shared fetch wrapper for all API calls: sends the auth cookie,
     // sets the JSON content-type header, parses the JSON response, and
@@ -1727,40 +1731,31 @@
       $("#greeting").textContent = `Welcome, ${me.user.name.split(" ")[0]}! 👋`; $("#booking-summary").textContent = dashboard.upcoming.length ? `You have ${dashboard.upcoming.length} upcoming booking${dashboard.upcoming.length === 1 ? "" : "s"}` : "Ready to book your next resource?";
       $("#upcoming-count").textContent = dashboard.upcoming.length; $("#resource-count").textContent = dashboard.resources; $("#total-bookings").textContent = dashboard.total;
       const next = dashboard.upcoming[0]; $("#next-reminder").textContent = next ? `${formatDate(next.date)} ${next.startTime}` : "—";
-      upcomingBookings = dashboard.upcoming;
+      upcomingBookings = dashboard.upcoming.filter((b) => !isBookingOver(b));
       renderBookings($("#upcoming-bookings"), upcomingBookings); renderResources($("#popular-resources"), resources.slice(0, 5));
       $("#reminders").innerHTML = renderReminderRows(upcomingBookings, 3) || "<p>No upcoming reminders.</p>";
       renderNotifPanel(upcomingBookings);
     }
     // Re-renders the "in Xh Ym" countdown labels (reminders card and
     // notification panel) from the already-fetched upcoming bookings —
-    // no API call, just recomputes elapsed time so labels don't go stale.
+    // no API call, just recomputes elapsed time so labels don't go stale,
+    // and drops any booking whose end time has passed since the last tick.
     function refreshCountdowns() {
-      if (!upcomingBookings.length) return;
+      upcomingBookings = upcomingBookings.filter((b) => !isBookingOver(b));
+      renderBookings($("#upcoming-bookings"), upcomingBookings);
       $("#reminders").innerHTML = renderReminderRows(upcomingBookings, 3) || "<p>No upcoming reminders.</p>";
       renderNotifPanel(upcomingBookings);
     }
     setInterval(refreshCountdowns, 30000);
     // Toggles the mobile sidebar open/closed.
-
     $("#menu-toggle").onclick = () => $("#sidebar").classList.toggle("open");
-
     // Every "Quick Book" button opens the booking panel.
-
     document.querySelectorAll("[data-open-booking]").forEach(button => button.onclick = () => openBooking());
-
     // Sidebar "Dashboard" link just reloads the page to reset the view.
-
     $("#dashboard-link").onclick = e => { e.preventDefault(); location.reload(); };
-
-
-
     // "Resources" nav links open the resources browsing panel.
     ["#resources-link", "#view-resources"].forEach(id => $(id).onclick = e => { e.preventDefault(); showResources().catch(e => alert(e.message)); });
     // "Bookings"/"reminders" nav links open the My Bookings panel.
-
-
-    
     ["#bookings-link", "#view-bookings", "#view-all-bookings", "#view-reminders", "#reminders-view-all"].forEach(id => $(id).onclick = e => { e.preventDefault(); showBookings().catch(e => alert(e.message)); });
     // Profile dropdown's "My Profile" link fetches and shows the user's
     // own profile details in a panel.
