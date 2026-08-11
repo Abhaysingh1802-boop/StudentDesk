@@ -1106,6 +1106,9 @@
         const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
         const dateLabel = (date) => new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" });
 
+        // Fetches the logged-in admin's profile (/me) and fills in the
+        // greeting, sub-greeting, and profile menu name/avatar initial.
+        // Redirects to the login page if the session cookie is invalid.
         async function loadAdminProfile() {
           const response = await fetch(`${API_URL}/me`, { credentials: "include" });
           const data = await response.json().catch(() => ({}));
@@ -1119,6 +1122,9 @@
           document.getElementById("profile-avatar").textContent = name.trim().charAt(0).toUpperCase() || "A";
         }
 
+        // Loads the admin dashboard summary (/admin/dashboard): resource,
+        // booking, today's-booking, and user counts, plus the sidebar
+        // badges, and hands the recent bookings list off to be rendered.
         async function loadAdminDashboard() {
           const response = await fetch(`${API_URL}/admin/dashboard`, { credentials: "include" });
           const data = await response.json().catch(() => ({}));
@@ -1134,12 +1140,17 @@
           renderRecentBookings(data.recentBookings || []);
         }
 
+        // Maps a booking's status string to the CSS tag class used to
+        // color its badge in the recent bookings table.
         function bookingStatusTag(status) {
           if (status === "confirmed") return "active";
           if (status === "cancelled") return "cancelled";
           return "pending";
         }
 
+        // Renders the "Recent bookings" table rows from a list of booking
+        // objects, including each row's per-booking dropdown menu
+        // (view in full list / cancel, unless already cancelled).
         function renderRecentBookings(bookings) {
           const body = document.getElementById("recentBookingsBody");
           if (!bookings.length) {
@@ -1165,6 +1176,8 @@
             </tr>`).join("");
         }
 
+        // Calls the API to cancel a booking by id (used from the recent
+        // bookings row menu) and returns the parsed response.
         async function callCancelBooking(id) {
           const response = await fetch(`${API_URL}/booking/${id}/cancel`, {
             method: "PATCH",
@@ -1175,6 +1188,8 @@
           return data;
         }
 
+        // Sends a new resource to the API (POST /AddResource) and
+        // returns the created resource, throwing on failure.
         async function callAddResource(resource) {
           const response = await fetch(`${API_URL}/AddResource`, {
             method: "POST",
@@ -1194,6 +1209,8 @@
           return data;
         }
 
+        // Sends updated resource fields to the API (PATCH /resource/:id)
+        // and returns the updated resource, throwing on failure.
         async function callEditResource(id, resource) {
           const response = await fetch(`${API_URL}/resource/${id}`, {
             method: "PATCH",
@@ -1211,6 +1228,8 @@
           return data;
         }
 
+        // Deletes a resource by id via the API (DELETE /delete/:id),
+        // throwing on failure.
         async function callDelete(id) {
           const response = await fetch(`${API_URL}/delete/${id}`, {
             method: "DELETE",
@@ -1226,6 +1245,8 @@
           return data;
         }
 
+        // Logs the admin out: clears the server-side auth cookie (best
+        // effort) then redirects back to the sign-in page regardless.
         async function callLogout() {
           try {
             await fetch(`${API_URL}/logout`, { method: "POST", credentials: "include" });
@@ -1235,6 +1256,9 @@
           location.href = "index.html";
         }
 
+        // Fetches resources from the API using the current search box
+        // and category filter values, caches them, resets to page 1,
+        // and re-renders the resources table.
         async function fetchResources() {
           const search = document.getElementById("resourceSearch").value.trim();
           const category = document.getElementById("resourceCategoryFilter").value;
@@ -1257,6 +1281,9 @@
           renderResources();
         }
 
+        // Renders the current page of resourcesCache into the resources
+        // table, along with the "Showing X–Y of Z" summary and the
+        // page-number pager buttons.
         function renderResources() {
           const tableBody = document.getElementById("resourcesTableBody");
           const total = resourcesCache.length;
@@ -1300,6 +1327,8 @@
           }
         }
 
+        // Populates the edit-resource form with an existing resource's
+        // values and opens the edit modal.
         function openEditModal(resource) {
           document.getElementById("edit-id").value = resource._id;
           document.getElementById("edit-name").value = resource.name;
@@ -1312,26 +1341,34 @@
           document.getElementById("editModalOverlay").style.display = "grid";
         }
 
+        // Hides the edit-resource modal.
         function closeEditModal() {
           document.getElementById("editModalOverlay").style.display = "none";
         }
 
+        // Closes any open dropdowns and shows the logout confirmation
+        // modal.
         function openLogoutModal() {
           closeAllDropdowns();
           document.getElementById("logoutModalOverlay").style.display = "grid";
         }
 
+        // Hides the logout confirmation modal.
         function closeLogoutModal() {
           document.getElementById("logoutModalOverlay").style.display = "none";
         }
 
         // ---- Dropdown handling: profile menu, notification panel, per-row booking menus ----
+        // Closes every open dropdown menu (profile, notifications, and
+        // per-row booking menus), optionally leaving one open.
         function closeAllDropdowns(except) {
           document.querySelectorAll(".dropdown-menu.open").forEach((menu) => {
             if (menu !== except) menu.classList.remove("open");
           });
         }
 
+        // Toggles the profile dropdown menu open/closed, closing any
+        // other open dropdown first.
         document.getElementById("profileToggle").addEventListener("click", (event) => {
           event.stopPropagation();
           const menu = document.getElementById("profileMenu");
@@ -1340,6 +1377,8 @@
           menu.classList.toggle("open", willOpen);
         });
 
+        // Toggles the notifications dropdown open/closed, closing any
+        // other open dropdown first.
         document.getElementById("notifButton").addEventListener("click", (event) => {
           event.stopPropagation();
           const menu = document.getElementById("notifMenu");
@@ -1348,6 +1387,9 @@
           menu.classList.toggle("open", willOpen);
         });
 
+        // Handles clicks inside the recent bookings table: cancels a
+        // booking when its "Cancel booking" action is clicked, or
+        // toggles that row's dropdown menu when its "..." button is clicked.
         document.getElementById("recentBookingsBody").addEventListener("click", (event) => {
           const toggle = event.target.closest(".row-menu-toggle");
           const cancelBtn = event.target.closest("[data-cancel-booking]");
@@ -1369,6 +1411,7 @@
           menu.classList.toggle("open", willOpen);
         });
 
+        // Clicking anywhere else on the page closes all open dropdowns.
         document.addEventListener("click", () => closeAllDropdowns());
 
         document.getElementById("profileLogout").addEventListener("click", openLogoutModal);
@@ -1380,6 +1423,9 @@
           if (event.target.id === "logoutModalOverlay") closeLogoutModal();
         });
 
+        // Handles the "Add a resource" form submit: builds the resource
+        // payload from the form fields, creates it via the API, refreshes
+        // the resources table and dashboard stats, then resets the form.
         document.getElementById("addResourceForm").addEventListener("submit", async (event) => {
           event.preventDefault();
           const form = event.currentTarget;
@@ -1406,6 +1452,9 @@
           }
         });
 
+        // Handles the "Edit resource" form submit: builds the updated
+        // payload, saves it via the API, refreshes the resources table
+        // and dashboard stats, then closes the edit modal.
         document.getElementById("editResourceForm").addEventListener("submit", async (event) => {
           event.preventDefault();
           const id = document.getElementById("edit-id").value;
@@ -1431,10 +1480,14 @@
         });
 
         document.getElementById("closeEditModal").addEventListener("click", closeEditModal);
+        // Clicking the modal's dark overlay (outside the modal card) closes it.
         document.getElementById("editModalOverlay").addEventListener("click", (event) => {
           if (event.target.id === "editModalOverlay") closeEditModal();
         });
 
+        // Handles clicks in the resources table: opens the edit modal for
+        // the clicked resource, or deletes it (after confirmation) and
+        // refreshes the table and dashboard stats.
         document.getElementById("resourcesTableBody").addEventListener("click", async (event) => {
           const deleteButton = event.target.closest(".delete");
           const editButton = event.target.closest(".edit");
@@ -1460,6 +1513,9 @@
           }
         });
 
+        // Debounces the resource search box so typing doesn't fire a
+        // request per keystroke; re-fetches resources 300ms after the
+        // user stops typing.
         document.getElementById("resourceSearch").addEventListener("input", () => {
           clearTimeout(searchDebounce);
           searchDebounce = setTimeout(() => {
@@ -1467,15 +1523,19 @@
           }, 300);
         });
 
+        // Re-fetches resources whenever the category filter changes.
         document.getElementById("resourceCategoryFilter").addEventListener("change", () => {
           fetchResources().catch((error) => alert(error.message));
         });
 
+        // Scrolls to and focuses the "Add a resource" form's name field.
         document.getElementById("focusAddResource").addEventListener("click", () => {
           document.getElementById("name").scrollIntoView({ behavior: "smooth", block: "center" });
           document.getElementById("name").focus();
         });
 
+        // Initial page load: fetch the admin's profile, dashboard stats,
+        // and resource list as soon as the DOM is ready.
         document.addEventListener("DOMContentLoaded", () => {
           loadAdminProfile().catch(() => { });
           loadAdminDashboard().catch((error) => alert(error.message));

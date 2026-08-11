@@ -1430,34 +1430,7 @@
             <div class="card-title">
               <h2>My Upcoming Bookings</h2><button class="text-link" id="view-all-bookings">View all</button>
             </div>
-            <div id="upcoming-bookings"><p>Loading bookings...</p></div><!--
-            <article class="booking-row">
-              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
-                <div><strong>Seminar Hall A</strong><span><i class="fa-solid fa-location-dot"></i>Main Campus</span>
-                </div>
-              </div>
-              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Tomorrow</strong><span>14:00 -
-                  16:00</span></div><span class="status">Confirmed</span><button class="more"
-                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-            </article>
-            <article class="booking-row">
-              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
-                <div><strong>Music Room</strong><span><i class="fa-solid fa-location-dot"></i>Main Campus</span></div>
-              </div>
-              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Tomorrow</strong><span>16:30 -
-                  18:30</span></div><span class="status">Confirmed</span><button class="more"
-                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-            </article>
-            <article class="booking-row">
-              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
-                <div><strong>Projector (AV Lab)</strong><span><i class="fa-solid fa-location-dot"></i>AV Lab</span>
-                </div>
-              </div>
-              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Friday, 17 May</strong><span>10:00 -
-                  12:00</span></div><span class="status">Confirmed</span><button class="more"
-                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-            </article>
-            -->
+            <div id="upcoming-bookings"><p>Loading bookings...</p></div>
             <div class="notice"><i class="fa-solid fa-circle-info"></i>You'll see your next booking here, with a reminder before it starts.</div>
           </section>
           <section class="card popular">
@@ -1511,6 +1484,9 @@
     const today = () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
     let resources = [];
 
+    // Shared fetch wrapper for all API calls: sends the auth cookie,
+    // sets the JSON content-type header, parses the JSON response, and
+    // redirects to login on a 401 or throws on any other non-OK response.
     async function api(path, options = {}) {
       const response = await fetch(`${API_URL}${path}`, { credentials: "include", headers: { "Content-Type": "application/json", ...(options.headers || {}) }, ...options });
       const data = await response.json().catch(() => ({}));
@@ -1519,6 +1495,9 @@
       return data;
     }
     const formatDate = (date) => new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    // Formats how far away a booking's start time is (e.g. "45m", "2h
+    // 10m", or the date itself once it's more than a day out) for
+    // reminder rows and the notification panel.
     function timeUntilLabel(date, startTime) {
       const target = new Date(`${date}T${startTime}:00+05:30`).getTime();
       const minutes = Math.round((target - Date.now()) / 60000);
@@ -1528,11 +1507,15 @@
       if (hours < 24) return rest ? `${hours}h ${rest}m` : `${hours}h`;
       return formatDate(date);
     }
+    // Builds the HTML for the "Upcoming Reminders" card rows from a list
+    // of bookings, optionally limited to the first `limit` items.
     function renderReminderRows(list, limit) {
       const items = limit ? list.slice(0, limit) : list;
       if (!items.length) return "";
       return items.map(b => `<article class="reminder"><span class="reminder-icon"><i class="fa-regular fa-bell"></i></span><div><strong>${esc(b.resource?.name || "Removed resource")}</strong><span>${formatDate(b.date)}, ${esc(b.startTime)}</span></div><b class="time-badge">${timeUntilLabel(b.date, b.startTime)}</b></article>`).join("");
     }
+    // Renders the notification bell's dropdown list (up to 6 upcoming
+    // bookings) and updates the unread-count badge on the bell icon.
     function renderNotifPanel(list) {
       const items = list.slice(0, 6);
       $("#notif-panel-list").innerHTML = items.length ? items.map(b => `<a class="notif-panel-item" href="#" data-open-booking-view><span class="reminder-icon"><i class="fa-regular fa-bell"></i></span><div><strong>${esc(b.resource?.name || "Removed resource")}</strong><span>${formatDate(b.date)}, ${esc(b.startTime)} · in ${timeUntilLabel(b.date, b.startTime)}</span></div></a>`).join("") : `<p class="notif-panel-empty">No upcoming reminders.</p>`;
@@ -1546,6 +1529,7 @@
       const now = new Date().toLocaleTimeString("en-GB", { hour12: false, timeZone: "Asia/Kolkata" }).slice(0, 5);
       return now >= open && now <= close;
     };
+   
     function renderResources(target, list) {
       target.innerHTML = list.length ? list.map(r => {
         const open = isOpenNow(r.openTime, r.closeTime);
@@ -1559,29 +1543,44 @@
         </article>`;
       }).join("") : "<p>No resources found.</p>";
     }
+    // Renders a list of booking rows into the given target element;
+    // when cancellable is true, confirmed bookings get a Cancel button.
     function renderBookings(target, list, cancellable = false) {
       target.innerHTML = list.length ? list.map(b => `<article class="booking-row"><div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span><div><strong>${esc(b.resource?.name || "Removed resource")}</strong><span><i class="fa-solid fa-location-dot"></i>${esc(b.resource?.location || "")}</span></div></div><div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>${formatDate(b.date)}</strong><span>${b.startTime} – ${b.endTime}</span></div><span class="status">${esc(b.status)}</span>${cancellable && b.status === "confirmed" ? `<button class="more cancel-booking" data-booking-id="${b._id}" aria-label="Cancel booking">Cancel</button>` : ""}</article>`).join("") : "<p>No bookings yet. Choose a resource to get started.</p>";
     }
+    // Swaps the main dashboard content area for a full-width panel with
+    // the given title and HTML content, plus a "Back to dashboard" link.
     function openPanel(title, content) {
       $("#dashboard-content").innerHTML = `<section class="card popular" style="width:100%"><div class="card-title"><h2>${title}</h2><button class="text-link" id="back-dashboard">Back to dashboard</button></div>${content}</section>`;
       $("#back-dashboard").onclick = () => location.reload();
     }
+    // Opens the "Resources" panel: loads the full resource catalog and
+    // renders it with a search box and category filter chips that filter
+    // the list live as the student types or picks a category.
     async function showResources() {
       const data = await api("/catalog/resources"); resources = data.resources;
       let activeFilter = "all";
       openPanel("Resources", `<div class="panel-toolbar"><label class="search" style="max-width:320px;flex:1"><i class="fa-solid fa-magnifying-glass"></i><input id="panel-search" placeholder="Search resources"></label><div class="filter-chips" id="panel-filters"><button class="chip active" data-filter="all">All</button><button class="chip" data-filter="hall">Halls</button><button class="chip" data-filter="room">Rooms</button><button class="chip" data-filter="equipment">Equipment</button></div></div><div id="panel-resources" class="resource-cards"></div>`);
       const refresh = () => renderResources($("#panel-resources"), resources.filter(r => (activeFilter === "all" || r.category === activeFilter) && `${r.name} ${r.location} ${r.category}`.toLowerCase().includes($("#panel-search").value.toLowerCase())));
+      // Re-filter the resource cards on every keystroke in the search box.
       $("#panel-search").oninput = refresh; refresh();
+      // Clicking a category chip switches the active filter and re-renders.
       $("#panel-filters").onclick = e => {
         const chip = e.target.closest(".chip"); if (!chip) return;
         $("#panel-filters").querySelectorAll(".chip").forEach(c => c.classList.remove("active")); chip.classList.add("active");
         activeFilter = chip.dataset.filter; refresh();
       };
+      // Clicking a resource card in the panel opens the booking form for it.
       $("#panel-resources").onclick = e => { const card = e.target.closest("[data-resource-id]"); if (card) openBooking(card.dataset.resourceId); };
     }
+    // Opens the "My Bookings" panel: loads all of the student's bookings
+    // (including past/cancelled) and renders them with cancel buttons,
+    // reloading the panel after a booking is cancelled.
     async function showBookings() {
       const data = await api("/bookings/me?status=all");
       openPanel("My Bookings", `<div id="all-bookings"></div>`); renderBookings($("#all-bookings"), data.bookings, true);
+      // Clicking a booking's Cancel button confirms, cancels it via the
+      // API, then reloads the My Bookings panel.
       $("#all-bookings").onclick = async e => { const button = e.target.closest(".cancel-booking"); if (button && confirm("Cancel this booking?")) { await api(`/bookings/${button.dataset.bookingId}/cancel`, { method: "PATCH" }); showBookings(); } };
     }
     const bookingIllustration = `<svg class="booking-illustration" viewBox="0 0 240 200" xmlns="http://www.w3.org/2000/svg">
@@ -1614,6 +1613,10 @@
         <rect x="0" y="38" width="24" height="18" rx="4" fill="#f2f6f5" stroke="#dfe9e8" stroke-width="1.5"/>
       </g>
     </svg>`;
+    // Opens the "Book a Resource" panel and wires up its form: loads the
+    // resource list if needed, live-checks availability whenever the
+    // chosen resource or date changes, and submits the booking to the
+    // API on form submit.
     async function openBooking(resourceId = "") {
       if (!resources.length) resources = (await api("/catalog/resources")).resources;
       if (!resourceId) resourceId = resources[0]?._id || "";
@@ -1667,6 +1670,10 @@
         catch (e) { alert(e.message); button.disabled = false; button.innerHTML = `<i class="fa-regular fa-calendar-check"></i><span>Confirm booking</span>`; }
       };
     }
+    // Initial dashboard load: fetches the current user, dashboard
+    // summary, and resource catalog in parallel, then fills in the
+    // greeting, stat cards, upcoming bookings, popular resources,
+    // reminders, and notification badge.
     async function loadDashboard() {
       const [me, dashboard, allResources] = await Promise.all([api("/me"), api("/dashboard"), api("/catalog/resources")]); resources = allResources.resources;
       $("#profile-name").textContent = me.user.name; $("#profile-role").textContent = me.user.role === "admin" ? "Administrator" : "Student";
@@ -1677,27 +1684,53 @@
       $("#reminders").innerHTML = renderReminderRows(dashboard.upcoming, 3) || "<p>No upcoming reminders.</p>";
       renderNotifPanel(dashboard.upcoming);
     }
+    // Toggles the mobile sidebar open/closed.
+
     $("#menu-toggle").onclick = () => $("#sidebar").classList.toggle("open");
+
+    // Every "Quick Book" button opens the booking panel.
+
     document.querySelectorAll("[data-open-booking]").forEach(button => button.onclick = () => openBooking());
+
+    // Sidebar "Dashboard" link just reloads the page to reset the view.
     $("#dashboard-link").onclick = e => { e.preventDefault(); location.reload(); };
+    // "Resources" nav links open the resources browsing panel.
     ["#resources-link", "#view-resources"].forEach(id => $(id).onclick = e => { e.preventDefault(); showResources().catch(e => alert(e.message)); });
+    // "Bookings"/"reminders" nav links open the My Bookings panel.
     ["#bookings-link", "#view-bookings", "#view-all-bookings", "#view-reminders", "#reminders-view-all"].forEach(id => $(id).onclick = e => { e.preventDefault(); showBookings().catch(e => alert(e.message)); });
+    // Profile dropdown's "My Profile" link fetches and shows the user's
+    // own profile details in a panel.
     $("#profile-link").onclick = e => { e.preventDefault(); api("/me").then(({user}) => openPanel("My Profile", `<p><strong>${esc(user.name)}</strong></p><p>${esc(user.email)}</p><p>Role: ${esc(user.role)}</p>`)); };
+    // Toggles the profile dropdown, closing the notifications panel if open.
     $("#profile-toggle").onclick = e => { e.stopPropagation(); $("#profile-menu").classList.toggle("open"); $("#notif-panel").classList.remove("open"); };
+    // Profile menu -> "Profile" item: close the menu and open the profile panel.
     $("#profile-menu-profile").onclick = () => { $("#profile-menu").classList.remove("open"); $("#profile-link").click(); };
+    // Profile menu -> "Bookings" item: close the menu and open My Bookings.
     $("#profile-menu-bookings").onclick = () => { $("#profile-menu").classList.remove("open"); showBookings().catch(e => alert(e.message)); };
+    // Profile menu -> "Log out" item: close the menu and show the logout confirm modal.
     $("#profile-menu-logout").onclick = () => { $("#profile-menu").classList.remove("open"); $("#logout-modal").style.display = "grid"; };
+    // Logout modal "Cancel" button dismisses the modal without logging out.
     $("#logout-cancel").onclick = () => { $("#logout-modal").style.display = "none"; };
+    // Clicking the logout modal's dark overlay (outside the card) dismisses it.
     $("#logout-modal").onclick = e => { if (e.target.id === "logout-modal") $("#logout-modal").style.display = "none"; };
+    // Logout modal "Log out" button: calls the logout API then redirects to login.
     $("#logout-confirm").onclick = async () => { await api("/logout", { method: "POST" }); location.href = "index.html"; };
+    // Toggles the notifications dropdown, closing the profile menu if open.
     $("#notif-button").onclick = e => { e.stopPropagation(); $("#notif-panel").classList.toggle("open"); $("#profile-menu").classList.remove("open"); };
+    // Clicking a notification item closes the panel and opens My Bookings.
     $("#notif-panel-list").onclick = e => { const item = e.target.closest("[data-open-booking-view]"); if (item) { e.preventDefault(); $("#notif-panel").classList.remove("open"); showBookings().catch(err => alert(err.message)); } };
+    // Clicking anywhere outside the notification/profile dropdowns closes them.
     document.addEventListener("click", e => {
       if (!e.target.closest(".notif-wrap")) $("#notif-panel").classList.remove("open");
       if (!e.target.closest(".profile-wrap")) $("#profile-menu").classList.remove("open");
     });
+    // Live-filters the "Popular resources" list on the dashboard as the
+    // student types in the resource search box.
     $("#resource-search").oninput = () => { const q = $("#resource-search").value.toLowerCase(); renderResources($("#popular-resources"), resources.filter(r => `${r.name} ${r.location}`.toLowerCase().includes(q)).slice(0, 5)); };
+    // Clicking a resource card on the dashboard opens the booking panel
+    // pre-selected to that resource.
     $("#popular-resources").onclick = e => { const card = e.target.closest("[data-resource-id]"); if (card) openBooking(card.dataset.resourceId); };
+    // Kick off the initial dashboard data load.
     loadDashboard().catch(error => alert(error.message));
   </script>
 </body>
