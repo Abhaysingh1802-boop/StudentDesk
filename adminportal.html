@@ -140,19 +140,39 @@
       margin-top: auto;
       border-top: 1px solid #334155;
       padding: 19px 8px 0;
+      display: grid;
+      gap: 6px;
     }
 
-    .help {
+    .help,
+    .logout-link {
       display: flex;
       gap: 10px;
       align-items: center;
       color: #cbd5e1;
       text-decoration: none;
       font-weight: 600;
+      background: transparent;
+      border: 0;
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: .2s;
     }
 
     .help i {
       color: var(--cyan);
+    }
+
+    .logout-link i {
+      color: var(--red);
+    }
+
+    .logout-link:hover {
+      background: #1e293b;
+      color: white;
     }
 
     .main {
@@ -217,6 +237,7 @@
       background: var(--panel);
       cursor: pointer;
       transition: .2s;
+      position: relative;
     }
 
     .icon-button:hover {
@@ -224,9 +245,31 @@
       color: var(--blue);
     }
 
+    .icon-button .dot {
+      position: absolute;
+      top: 7px;
+      right: 8px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--red);
+      display: none;
+    }
+
+    .icon-button .dot.show {
+      display: block;
+    }
+
+    .header-actions {
+      position: relative;
+    }
+
     .profile {
       border-left: 1px solid var(--line);
       padding-left: 15px;
+      cursor: pointer;
+      position: relative;
+      user-select: none;
     }
 
     .avatar {
@@ -238,6 +281,7 @@
       background: #0f766e;
       color: white;
       font-weight: 700;
+      flex-shrink: 0;
     }
 
     .profile-name {
@@ -461,6 +505,11 @@
       background: #fef3c7
     }
 
+    .other {
+      color: #6d28d9;
+      background: #ede9fe
+    }
+
     .active {
       color: #15803d;
       background: #dcfce7
@@ -471,9 +520,15 @@
       background: #fef3c7
     }
 
+    .cancelled {
+      color: #be123c;
+      background: #ffe4e6
+    }
+
     .actions {
       display: flex;
       gap: 7px;
+      position: relative;
     }
 
     .table-btn {
@@ -650,6 +705,105 @@
       margin-bottom: 16px;
     }
 
+    /* Dropdown menus: profile, notifications, row actions */
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      min-width: 190px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px #0f172a1f;
+      padding: 6px;
+      display: none;
+      z-index: 40;
+    }
+
+    .dropdown-menu.open {
+      display: block;
+    }
+
+    .dropdown-menu.wide {
+      min-width: 260px;
+      padding: 10px;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 10px;
+      border-radius: 8px;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      text-align: left;
+      text-decoration: none;
+    }
+
+    .dropdown-item i {
+      width: 16px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .dropdown-item:hover {
+      background: var(--panel-2);
+    }
+
+    .dropdown-item.danger {
+      color: var(--red);
+    }
+
+    .dropdown-item.danger i {
+      color: var(--red);
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 5px 2px;
+    }
+
+    .notif-empty {
+      padding: 22px 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .notif-item {
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .notif-item:hover {
+      background: var(--panel-2);
+    }
+
+    .notif-title {
+      font-weight: 700;
+      font-size: 12.5px;
+      margin-bottom: 2px;
+    }
+
+    .notif-time {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .row-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      min-width: 170px;
+    }
+
     @media(max-width:1100px) {
       .stats {
         grid-template-columns: repeat(2, 1fr)
@@ -729,8 +883,10 @@
           <li><a href="users.html"><i class="fa-solid fa-users"></i>Users</a></li>
         </ul>
       </div>
-      <div class="side-bottom"><a class="help" href="#"><i class="fa-regular fa-circle-question"></i>Help &amp;
-          support</a></div>
+      <div class="side-bottom">
+        <a class="help" href="#"><i class="fa-regular fa-circle-question"></i>Help &amp; support</a>
+        <button class="logout-link" type="button" id="sidebarLogout"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log out</button>
+      </div>
     </aside>
     <main class="main">
       <header>
@@ -739,12 +895,23 @@
           <h1 id="admin-greeting">Welcome</h1>
           <p class="card-subtitle" id="admin-greeting-sub" style="margin-top:4px"></p>
         </div>
-        <div class="header-actions"><button class="icon-button" aria-label="Notifications"><i
-              class="fa-regular fa-bell"></i></button>
-          <div class="profile">
+        <div class="header-actions">
+          <button class="icon-button" id="notifButton" aria-label="Notifications" aria-haspopup="true"><i class="fa-regular fa-bell"></i><span class="dot" id="notifDot"></span></button>
+          <div class="dropdown-menu wide" id="notifMenu" aria-label="Notifications panel">
+            <div id="notifList">
+              <div class="notif-empty">No new notifications</div>
+            </div>
+          </div>
+          <div class="profile" id="profileToggle" aria-haspopup="true">
             <div class="avatar" id="profile-avatar">A</div>
             <div><span class="profile-name" id="profile-name-text">Admin</span><span class="profile-role">Administrator</span></div><i
               class="fa-solid fa-chevron-down" style="font-size:11px;color:var(--muted)"></i>
+            <div class="dropdown-menu" id="profileMenu">
+              <a class="dropdown-item" href="users.html"><i class="fa-solid fa-users"></i>Manage users</a>
+              <a class="dropdown-item" href="bookings.html"><i class="fa-regular fa-calendar-check"></i>Bookings</a>
+              <div class="dropdown-divider"></div>
+              <button class="dropdown-item danger" type="button" id="profileLogout"><i class="fa-solid fa-arrow-right-from-bracket"></i>Log out</button>
+            </div>
           </div>
         </div>
       </header>
@@ -766,7 +933,7 @@
             <div class="stat-top"><span>Today's bookings</span><span class="stat-icon"><i
                   class="fa-solid fa-calendar-day"></i></span></div>
             <p class="stat-number" id="admin-today-count">—</p>
-            <p class="trend neutral"><strong>3 upcoming</strong>this afternoon</p>
+            <p class="trend neutral"><strong id="admin-today-trend-text">—</strong>this afternoon</p>
           </article>
           <article class="card stat" style="--accent:var(--cyan)">
             <div class="stat-top"><span>Active users</span><span class="stat-icon"><i
@@ -805,40 +972,7 @@
                 </thead>
                 <tbody id="resourcesTableBody">
                   <tr>
-                    <td><strong>Conference Hall A</strong></td>
-                    <td><span class="tag hall">Hall</span></td>
-                    <td>Block A</td>
-                    <td>09:00 – 18:00</td>
-                    <td><span class="tag active">Active</span></td>
-                    <td>
-                      <div class="actions"><button class="table-btn" aria-label="Edit"><i
-                            class="fa-solid fa-pen"></i></button><button class="table-btn delete" aria-label="Delete"><i
-                            class="fa-solid fa-trash"></i></button></div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>Seminar Room 1</strong></td>
-                    <td><span class="tag room">Room</span></td>
-                    <td>Block B</td>
-                    <td>08:00 – 17:00</td>
-                    <td><span class="tag active">Active</span></td>
-                    <td>
-                      <div class="actions"><button class="table-btn" aria-label="Edit"><i
-                            class="fa-solid fa-pen"></i></button><button class="table-btn delete" aria-label="Delete"><i
-                            class="fa-solid fa-trash"></i></button></div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>Projector 01</strong></td>
-                    <td><span class="tag equipment">Equipment</span></td>
-                    <td>Library</td>
-                    <td>09:00 – 18:00</td>
-                    <td><span class="tag active">Active</span></td>
-                    <td>
-                      <div class="actions"><button class="table-btn" aria-label="Edit"><i
-                            class="fa-solid fa-pen"></i></button><button class="table-btn delete" aria-label="Delete"><i
-                            class="fa-solid fa-trash"></i></button></div>
-                    </td>
+                    <td colspan="6">Loading resources…</td>
                   </tr>
                 </tbody>
               </table>
@@ -897,31 +1031,7 @@
               </thead>
               <tbody id="recentBookingsBody">
                 <tr>
-                  <td><strong>Conference Hall A</strong></td>
-                  <td>Abhay R.</td>
-                  <td>28 Jul 2026</td>
-                  <td>10:00 – 11:30</td>
-                  <td><span class="tag active">Approved</span></td>
-                  <td><button class="table-btn" aria-label="More options"><i class="fa-solid fa-ellipsis"></i></button>
-                  </td>
-                </tr>
-                <tr>
-                  <td><strong>Projector 01</strong></td>
-                  <td>Kishan M.</td>
-                  <td>28 Jul 2026</td>
-                  <td>12:00 – 14:00</td>
-                  <td><span class="tag pending">Pending</span></td>
-                  <td><button class="table-btn" aria-label="More options"><i class="fa-solid fa-ellipsis"></i></button>
-                  </td>
-                </tr>
-                <tr>
-                  <td><strong>Seminar Room 1</strong></td>
-                  <td>Pooja S.</td>
-                  <td>28 Jul 2026</td>
-                  <td>15:00 – 16:30</td>
-                  <td><span class="tag active">Approved</span></td>
-                  <td><button class="table-btn" aria-label="More options"><i class="fa-solid fa-ellipsis"></i></button>
-                  </td>
+                  <td colspan="6">Loading bookings…</td>
                 </tr>
               </tbody>
             </table>
@@ -952,6 +1062,20 @@
             <div class="toggle"><span>Resource is active</span><input id="edit-isActive" class="switch" type="checkbox"></div>
             <button type="submit" class="primary save">Save changes</button>
           </form>
+        </div>
+      </div>
+      <!-- Logout confirmation -->
+      <div class="modal-overlay" id="logoutModalOverlay" style="display:none">
+        <div class="modal" style="max-width:360px">
+          <div class="modal-header">
+            <h2>Log out</h2>
+            <button class="table-btn" type="button" id="closeLogoutModal" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <p class="card-subtitle" style="margin-bottom:18px">You'll need to sign in again to access the admin portal.</p>
+          <div style="display:flex;gap:10px">
+            <button class="primary" type="button" id="cancelLogout" style="flex:1;background:var(--panel-2);color:var(--text)">Cancel</button>
+            <button class="primary" type="button" id="confirmLogout" style="flex:1;background:var(--red)">Log out</button>
+          </div>
         </div>
       </div>
       <script>
@@ -986,15 +1110,52 @@
           document.getElementById("admin-resource-count").textContent = data.resources;
           document.getElementById("admin-booking-count").textContent = data.bookings;
           document.getElementById("admin-today-count").textContent = data.todayBookings;
+          document.getElementById("admin-today-trend-text").textContent = `${data.todayBookings} booking${data.todayBookings === 1 ? "" : "s"}`;
           document.getElementById("admin-user-count").textContent = data.users;
           document.getElementById("booking-badge").textContent = data.todayBookings;
           document.getElementById("resource-badge").textContent = data.resources;
+          renderRecentBookings(data.recentBookings || []);
+        }
+
+        function bookingStatusTag(status) {
+          if (status === "confirmed") return "active";
+          if (status === "cancelled") return "cancelled";
+          return "pending";
+        }
+
+        function renderRecentBookings(bookings) {
           const body = document.getElementById("recentBookingsBody");
-          body.innerHTML = data.recentBookings.length ? data.recentBookings.map(booking => `
-            <tr><td><strong>${escapeHtml(booking.resource?.name || "Deleted resource")}</strong></td>
-            <td>${escapeHtml(booking.user?.name || "Deleted user")}</td><td>${dateLabel(booking.date)}</td>
-            <td>${escapeHtml(booking.startTime)} – ${escapeHtml(booking.endTime)}</td>
-            <td><span class="tag ${booking.status === "confirmed" ? "active" : "pending"}">${escapeHtml(booking.status)}</span></td><td></td></tr>`).join("") : `<tr><td colspan="6">No bookings yet.</td></tr>`;
+          if (!bookings.length) {
+            body.innerHTML = `<tr><td colspan="6">No bookings yet.</td></tr>`;
+            return;
+          }
+          body.innerHTML = bookings.map((booking) => `
+            <tr>
+              <td><strong>${escapeHtml(booking.resource?.name || "Deleted resource")}</strong></td>
+              <td>${escapeHtml(booking.user?.name || "Deleted user")}</td>
+              <td>${dateLabel(booking.date)}</td>
+              <td>${escapeHtml(booking.startTime)} – ${escapeHtml(booking.endTime)}</td>
+              <td><span class="tag ${bookingStatusTag(booking.status)}">${escapeHtml(booking.status)}</span></td>
+              <td>
+                <div class="actions">
+                  <button class="table-btn row-menu-toggle" type="button" aria-label="More options" data-booking-id="${booking._id}"><i class="fa-solid fa-ellipsis"></i></button>
+                  <div class="dropdown-menu row-menu" data-booking-menu="${booking._id}">
+                    <a class="dropdown-item" href="bookings.html"><i class="fa-regular fa-eye"></i>View in bookings</a>
+                    ${booking.status !== "cancelled" ? `<button class="dropdown-item danger" type="button" data-cancel-booking="${booking._id}"><i class="fa-regular fa-circle-xmark"></i>Cancel booking</button>` : ""}
+                  </div>
+                </div>
+              </td>
+            </tr>`).join("");
+        }
+
+        async function callCancelBooking(id) {
+          const response = await fetch(`${API_URL}/booking/${id}/cancel`, {
+            method: "PATCH",
+            credentials: "include",
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.message || "Unable to cancel booking.");
+          return data;
         }
 
         async function callAddResource(resource) {
@@ -1046,6 +1207,15 @@
           }
 
           return data;
+        }
+
+        async function callLogout() {
+          try {
+            await fetch(`${API_URL}/logout`, { method: "POST", credentials: "include" });
+          } catch (error) {
+            // Best-effort: still redirect even if the network call fails.
+          }
+          location.href = "index.html";
         }
 
         async function fetchResources() {
@@ -1128,6 +1298,70 @@
         function closeEditModal() {
           document.getElementById("editModalOverlay").style.display = "none";
         }
+
+        function openLogoutModal() {
+          closeAllDropdowns();
+          document.getElementById("logoutModalOverlay").style.display = "grid";
+        }
+
+        function closeLogoutModal() {
+          document.getElementById("logoutModalOverlay").style.display = "none";
+        }
+
+        // ---- Dropdown handling: profile menu, notification panel, per-row booking menus ----
+        function closeAllDropdowns(except) {
+          document.querySelectorAll(".dropdown-menu.open").forEach((menu) => {
+            if (menu !== except) menu.classList.remove("open");
+          });
+        }
+
+        document.getElementById("profileToggle").addEventListener("click", (event) => {
+          event.stopPropagation();
+          const menu = document.getElementById("profileMenu");
+          const willOpen = !menu.classList.contains("open");
+          closeAllDropdowns();
+          menu.classList.toggle("open", willOpen);
+        });
+
+        document.getElementById("notifButton").addEventListener("click", (event) => {
+          event.stopPropagation();
+          const menu = document.getElementById("notifMenu");
+          const willOpen = !menu.classList.contains("open");
+          closeAllDropdowns();
+          menu.classList.toggle("open", willOpen);
+        });
+
+        document.getElementById("recentBookingsBody").addEventListener("click", (event) => {
+          const toggle = event.target.closest(".row-menu-toggle");
+          const cancelBtn = event.target.closest("[data-cancel-booking]");
+
+          if (cancelBtn) {
+            const id = cancelBtn.dataset.cancelBooking;
+            if (!confirm("Cancel this booking?")) return;
+            callCancelBooking(id)
+              .then(() => loadAdminDashboard())
+              .catch((error) => alert(error.message));
+            return;
+          }
+
+          if (!toggle) return;
+          event.stopPropagation();
+          const menu = document.querySelector(`[data-booking-menu="${toggle.dataset.bookingId}"]`);
+          const willOpen = !menu.classList.contains("open");
+          closeAllDropdowns();
+          menu.classList.toggle("open", willOpen);
+        });
+
+        document.addEventListener("click", () => closeAllDropdowns());
+
+        document.getElementById("profileLogout").addEventListener("click", openLogoutModal);
+        document.getElementById("sidebarLogout").addEventListener("click", openLogoutModal);
+        document.getElementById("closeLogoutModal").addEventListener("click", closeLogoutModal);
+        document.getElementById("cancelLogout").addEventListener("click", closeLogoutModal);
+        document.getElementById("confirmLogout").addEventListener("click", callLogout);
+        document.getElementById("logoutModalOverlay").addEventListener("click", (event) => {
+          if (event.target.id === "logoutModalOverlay") closeLogoutModal();
+        });
 
         document.getElementById("addResourceForm").addEventListener("submit", async (event) => {
           event.preventDefault();
