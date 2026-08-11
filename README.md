@@ -6,6 +6,7 @@ rooms, equipment — for a time slot; admins manage the resource catalog,
 bookings, and user roles.
 
 Live: https://abhhunt.in
+demo video linke: https://drive.google.com/file/d/1s1Ixjk3lRYQfBKkmZfasce4qPVuzLTco/view?usp=sharing
 
 ## Tech stack
 
