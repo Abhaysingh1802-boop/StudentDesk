@@ -1430,8 +1430,34 @@
             <div class="card-title">
               <h2>My Upcoming Bookings</h2><button class="text-link" id="view-all-bookings">View all</button>
             </div>
-            <div id="upcoming-bookings"><p>Loading bookings...</p></div>
-         
+            <div id="upcoming-bookings"><p>Loading bookings...</p></div><!--
+            <article class="booking-row">
+              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
+                <div><strong>Seminar Hall A</strong><span><i class="fa-solid fa-location-dot"></i>Main Campus</span>
+                </div>
+              </div>
+              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Tomorrow</strong><span>14:00 -
+                  16:00</span></div><span class="status">Confirmed</span><button class="more"
+                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            </article>
+            <article class="booking-row">
+              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
+                <div><strong>Music Room</strong><span><i class="fa-solid fa-location-dot"></i>Main Campus</span></div>
+              </div>
+              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Tomorrow</strong><span>16:30 -
+                  18:30</span></div><span class="status">Confirmed</span><button class="more"
+                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            </article>
+            <article class="booking-row">
+              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
+                <div><strong>Projector (AV Lab)</strong><span><i class="fa-solid fa-location-dot"></i>AV Lab</span>
+                </div>
+              </div>
+              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Friday, 17 May</strong><span>10:00 -
+                  12:00</span></div><span class="status">Confirmed</span><button class="more"
+                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            </article>
+            -->
             <div class="notice"><i class="fa-solid fa-circle-info"></i>You'll see your next booking here, with a reminder before it starts.</div>
           </section>
           <section class="card popular">
@@ -1615,7 +1641,7 @@
           ${bookingIllustration}
           <div class="tip-card">
             <span class="tip-icon"><i class="fa-regular fa-clock"></i></span>
-            <div><strong>Plan your time wisely</strong><span>Resources are available between</span><b id="tip-hours">09:00 – 18:00</b></div>
+            <div><strong>Plan your time wisely</strong><span>Resources are available between</span><b id="tip-hours">—</b></div>
           </div>
         </aside>
       </section>`;
@@ -1671,6 +1697,7 @@
       if (!e.target.closest(".profile-wrap")) $("#profile-menu").classList.remove("open");
     });
     $("#resource-search").oninput = () => { const q = $("#resource-search").value.toLowerCase(); renderResources($("#popular-resources"), resources.filter(r => `${r.name} ${r.location}`.toLowerCase().includes(q)).slice(0, 5)); };
+    $("#popular-resources").onclick = e => { const card = e.target.closest("[data-resource-id]"); if (card) openBooking(card.dataset.resourceId); };
     loadDashboard().catch(error => alert(error.message));
   </script>
 </body>
