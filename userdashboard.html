@@ -432,7 +432,7 @@
       border: 1px solid #edf0f1;
       border-radius: 13px;
       display: grid;
-      grid-template-columns: minmax(200px, 1.25fr) minmax(155px, .8fr) auto 19px;
+      grid-template-columns: minmax(200px, 1.25fr) minmax(155px, .8fr) auto minmax(19px, auto);
       align-items: center;
       gap: 17px;
       box-shadow: 0 3px 8px #0a203108;
@@ -505,6 +505,24 @@
       border: 0;
       background: transparent;
       font-size: 20px;
+    }
+
+    /* Text "Cancel" button on a booking row (shares .more's grid slot,
+       but needs real button chrome since it's a label, not an icon). */
+    .more.cancel-booking {
+      border: 1px solid #f3c6cc;
+      background: #fff5f6;
+      color: #be123c;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 7px;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .more.cancel-booking:hover {
+      background: #ffe4e6;
     }
 
     .notice {
@@ -1430,7 +1448,34 @@
             <div class="card-title">
               <h2>My Upcoming Bookings</h2><button class="text-link" id="view-all-bookings">View all</button>
             </div>
-            <div id="upcoming-bookings"><p>Loading bookings...</p></div>
+            <div id="upcoming-bookings"><p>Loading bookings...</p></div><!--
+            <article class="booking-row">
+              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
+                <div><strong>Seminar Hall A</strong><span><i class="fa-solid fa-location-dot"></i>Main Campus</span>
+                </div>
+              </div>
+              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Tomorrow</strong><span>14:00 -
+                  16:00</span></div><span class="status">Confirmed</span><button class="more"
+                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            </article>
+            <article class="booking-row">
+              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
+                <div><strong>Music Room</strong><span><i class="fa-solid fa-location-dot"></i>Main Campus</span></div>
+              </div>
+              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Tomorrow</strong><span>16:30 -
+                  18:30</span></div><span class="status">Confirmed</span><button class="more"
+                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            </article>
+            <article class="booking-row">
+              <div class="resource"><span class="row-icon"><i class="fa-regular fa-calendar-check"></i></span>
+                <div><strong>Projector (AV Lab)</strong><span><i class="fa-solid fa-location-dot"></i>AV Lab</span>
+                </div>
+              </div>
+              <div class="date-cell"><i class="fa-regular fa-calendar"></i><strong>Friday, 17 May</strong><span>10:00 -
+                  12:00</span></div><span class="status">Confirmed</span><button class="more"
+                aria-label="More options"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            </article>
+            -->
             <div class="notice"><i class="fa-solid fa-circle-info"></i>You'll see your next booking here, with a reminder before it starts.</div>
           </section>
           <section class="card popular">
@@ -1529,7 +1574,8 @@
       const now = new Date().toLocaleTimeString("en-GB", { hour12: false, timeZone: "Asia/Kolkata" }).slice(0, 5);
       return now >= open && now <= close;
     };
-   
+    // Renders a grid of resource cards (with an open/closed badge
+    // computed from the current time) into the given target element.
     function renderResources(target, list) {
       target.innerHTML = list.length ? list.map(r => {
         const open = isOpenNow(r.openTime, r.closeTime);
@@ -1685,13 +1731,9 @@
       renderNotifPanel(dashboard.upcoming);
     }
     // Toggles the mobile sidebar open/closed.
-
     $("#menu-toggle").onclick = () => $("#sidebar").classList.toggle("open");
-
     // Every "Quick Book" button opens the booking panel.
-
     document.querySelectorAll("[data-open-booking]").forEach(button => button.onclick = () => openBooking());
-
     // Sidebar "Dashboard" link just reloads the page to reset the view.
     $("#dashboard-link").onclick = e => { e.preventDefault(); location.reload(); };
     // "Resources" nav links open the resources browsing panel.
