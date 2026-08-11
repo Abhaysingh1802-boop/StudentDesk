@@ -1745,6 +1745,8 @@
       renderBookings($("#upcoming-bookings"), upcomingBookings);
       $("#reminders").innerHTML = renderReminderRows(upcomingBookings, 3) || "<p>No upcoming reminders.</p>";
       renderNotifPanel(upcomingBookings);
+      const next = upcomingBookings[0];
+      $("#next-reminder").textContent = next ? `${formatDate(next.date)} ${next.startTime}` : "—";
     }
     setInterval(refreshCountdowns, 30000);
     // Toggles the mobile sidebar open/closed.
