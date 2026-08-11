@@ -1,4 +1,4 @@
-
+if you want to test admin part you can mail me i will make user from user to admin ( only admin can do this )
 # CampusDesk (StudentDesk)
 
 A campus resource booking platform. Students book shared resources — halls,
